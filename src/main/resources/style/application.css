@@ -1,0 +1,42 @@
+.root {
+	colorBackground: #fcfcfc;
+	colorBc: #bc3435;
+	colorOk: GREEN;
+	colorStop: RED;
+	colorWarn: ORANGE;
+	
+	-fx-font-family: "Montserrat";
+	
+	-fx-background-color: colorBackground;
+}
+
+#header {
+	-fx-background-color: colorBc;
+	-fx-font-size: 30pt;
+}
+#header .label {
+	-fx-text-fill: WHITE;
+}
+
+#footer {
+	
+}
+
+#footer .button {
+	-fx-pref-height: 40pt;
+	-fx-pref-width: 100pt;
+}
+#footer .jfx-button {
+	-jfx-button-type: RAISED;
+	-fx-text-fill: WHITE;
+}
+
+#buttonApply {
+	-fx-background-color: colorOk;
+}
+#buttonExit {
+	-fx-background-color: colorStop;
+}
+#buttonReload {
+	-fx-background-color: colorWarn;
+}
