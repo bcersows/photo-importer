@@ -1,0 +1,46 @@
+*.class
+
+*.classpath
+*.project
+*.settings
+/eLB.properties
+/*Settings.properties
+.clientid
+createDDL.jdbc
+elb.ddl
+elb-masterdata.ddl
+/logConfig.xml
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.ear
+*.log
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+/target/
+/bin/
+/.apt_generated/
+/buildNumber/
+/databases/
+/activemq-data/
+/EB.2go/
+/SDT/
+/logs/
+/USB/
+/usb/
+
+/.externalToolBuilders/
+/.factorypath
+/.project.sublime-workspace
+/.gitignore
+/RESET.bat
+/reset.bat
+/help/**/*.php
+build/
+*gradle*
+**/server.lock
