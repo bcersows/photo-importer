@@ -6,13 +6,32 @@
 	colorWarn: ORANGE;
 	
 	-fx-font-family: "Montserrat";
+	-fx-font-size: 10pt;
 	
 	-fx-background-color: colorBackground;
+}
+
+.scroll-pane, .scroll-pane > .viewport {
+   -fx-background-color: transparent;
+}
+
+.loading-icon {
+	-fx-background-image: url("imgs/loading.gif");
+	-fx-background-repeat: no-repeat;
+    /*-fx-background-position: 90%;*/
+    -fx-background-size: 100%;
+}
+
+.fontAwesome {
+	-fx-font-family: "Font Awesome 5 Free";
+	-fx-font-weight: 100;
 }
 
 #header {
 	-fx-background-color: colorBc;
 	-fx-font-size: 30pt;
+	
+	-fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 1), 10, 0, 0, 0);
 }
 #header .label {
 	-fx-text-fill: WHITE;
@@ -30,6 +49,9 @@
 	-jfx-button-type: RAISED;
 	-fx-text-fill: WHITE;
 }
+#footer .jfx-button .label {
+	-fx-text-fill: WHITE;
+}
 
 #buttonApply {
 	-fx-background-color: colorOk;
@@ -39,4 +61,24 @@
 }
 #buttonReload {
 	-fx-background-color: colorWarn;
+}
+
+#areaProgress {
+	-fx-border-width: 0 0 2 0;
+	-fx-border-color: colorBc;
+}
+
+
+#contentArea > .contentContainer {
+	-fx-padding: 5px;
+	
+	-fx-min-height: 40pt;
+	-fx-min-width: 300pt;
+	-fx-pref-width: 450pt;
+	-fx-max-width: 450pt;
+	
+	-fx-background-color: WHITE;
+}
+#contentArea > .contentContainer .contentContainerHeader {
+	-fx-font-size: 14pt;
 }
