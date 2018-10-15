@@ -2,6 +2,7 @@ package de.bcersows.photoimporter;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import de.bcersows.photoimporter.model.LoadedActivity;
 import de.bcersows.photoimporter.model.ToolSettings;
@@ -16,6 +17,8 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 public class Main extends Application {
+    private static final Logger LOG = Logger.getLogger(Main.class.getName());
+    /** The name of the application. **/
     private static final String APPLICATION_NAME = "Photo Importer";
 
     private ToolSettings settings;
@@ -57,7 +60,6 @@ public class Main extends Application {
             final Class<? extends Activity> clazz = key.getActivityClass();
             final Activity activity = clazz.newInstance();
             activity.setMain(this);
-            activity.setStage(stage);
             sceneLoader.setController(activity);
             final Parent root = sceneLoader.load();
             activity.initialize();
@@ -77,7 +79,6 @@ public class Main extends Application {
 
         this.currentActivity = activity.getActivity();
         scene.setRoot(activity.getRoot());
-        this.currentActivity.setScene(scene);
         this.currentActivity.postShow();
     }
 
@@ -99,7 +100,7 @@ public class Main extends Application {
     /** The close request. **/
     public void onCloseRequest(final WindowEvent windowEvent) {
         terminateCurrentActivity();
-        System.out.println("Shutting down!");
+        LOG.info("Shutting down!");
 
         if (null != windowEvent) {
             windowEvent.consume();

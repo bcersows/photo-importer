@@ -1,6 +1,7 @@
 package de.bcersows.photoimporter.ui;
 
 import de.bcersows.photoimporter.Main;
+import de.bcersows.photoimporter.texts.TextDefinition;
 import javafx.scene.Scene;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
@@ -36,27 +37,6 @@ public abstract class Activity {
         this.main = main;
     }
 
-    /** Set the stage of the application. **/
-    public final void setStage(final Stage stage) {
-        this.stage = stage;
-    }
-
-    /** Get the stage of the application. **/
-    protected final Stage getStage() {
-        return this.stage;
-    }
-
-    /**
-     * @param scene
-     */
-    public void setScene(final Scene scene) {
-        this.scene = scene;
-    }
-
-    protected Scene getScene() {
-        return this.scene;
-    }
-
     /**
      * Return the size as String.
      */
@@ -65,32 +45,10 @@ public abstract class Activity {
     }
 
     /**
-     * Return the size of the stage as String.
-     */
-    protected final String getStageSize() {
-        if (null != getStage()) {
-            return getSize(getStage().getWidth(), getStage().getHeight());
-        } else {
-            return "";
-        }
-    }
-
-    /**
-     * Return the size of the scene as String.
-     */
-    protected final String getSceneSize() {
-        if (null != getScene()) {
-            return getSize(getScene().getWidth(), getScene().getHeight());
-        } else {
-            return "";
-        }
-    }
-
-    /**
      * Return the size as String.
      */
     protected final String getSize(final double width, final double height) {
-        return "(" + width + "/" + height + ")";
+        return TextDefinition.BRACKET_OPEN + width + TextDefinition.SLASH + height + TextDefinition.BRACKET_CLOSE;
     }
 
     /** The possible activities. **/

@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
@@ -22,6 +23,8 @@ import javafx.util.Callback;
  * @author BCE
  */
 public class FileManager {
+    private static final Logger LOG = Logger.getLogger(FileManager.class.getName());
+
     private static final String FILE_TYPE_GIF = "gif";
     private static final String FILE_TYPE_PNG = "png";
     private static final String FILE_TYPE_JPG = "jpg";
@@ -89,7 +92,7 @@ public class FileManager {
         // copy every single file, update the state accordingly
         for (final File file : filesToUpdate.values()) {
             final String msg = "Copying " + file.getAbsolutePath() + "...";
-            System.out.println(msg);
+            LOG.info(msg);
             statusUpdateCallback.call(new CopyInformation(file.getAbsolutePath(), true, msg));
 
             // TODO bce bce maybe catch some exceptions and set the success state to false?

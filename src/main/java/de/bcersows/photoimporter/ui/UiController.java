@@ -28,6 +28,7 @@ import de.bcersows.photoimporter.model.CopyInformation;
 import de.bcersows.photoimporter.model.FileException;
 import de.bcersows.photoimporter.model.FileInformation;
 import de.bcersows.photoimporter.model.ToolSettings;
+import de.bcersows.photoimporter.texts.TextDefinition;
 import de.bcersows.photoimporter.ui.components.ListCellFileFactory;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -35,7 +36,6 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
@@ -128,58 +128,10 @@ public class UiController extends Activity {
     private ListCellFileFactory listCellFileFactory;
     private final DateFormat stateProgressDateFormat;
 
-    private final ChangeListener<Number> contentResizeListener = (obs, oldVal, newVal) -> {
-        // LOG.warning("Something got resized: stage=" + getStageSize() + ", listFilesScroll=" + getSize(this.listFilesScroll) + ", listFilesToUpdate="
-        // + getSize(this.listFilesToUpdate) + ".");
-        System.out.println("Something got resized: stage=" + getStageSize() + ", scene=" + getSceneSize() + ", listFilesArea=" + getSize(this.listFilesArea));
-        // System.out.println("Detected by " + obs);
-
-        calculateContentSize();
-    };
-
     public UiController() {
         this.fileManager = new FileManager();
 
         this.stateProgressDateFormat = new SimpleDateFormat("HH:mm:ss':' ");
-    }
-
-    /**
-     * Calculate and set the size of the content.
-     */
-    private synchronized void calculateContentSize() {
-        // TODO bce bce calculate size
-        // final double spacing = 10;
-        final double stageWidth = getStage().getWidth();
-        final double stageHeight = getStage().getHeight();
-
-        final double sceneWidth = getScene().getWidth();
-
-        final double parentWidth = getWidth(this.contentArea);
-        final double sidebarWidth = this.contentSide.getWidth();
-        final double containerWidth = getWidth(this.listFilesArea);
-        final double containerHeight = this.contentArea.getHeight() - this.contentArea.getPadding().getTop() - this.contentArea.getPadding().getBottom();
-
-        double width = parentWidth - sidebarWidth;
-        if (width > stageWidth) {
-            width = stageWidth - sidebarWidth;
-        }
-
-        final double height = containerHeight;
-
-        final double finalWidth = width;
-
-        LOG.warning("Calculated new size: " + finalWidth + "/" + height);
-
-        System.out.println("Inside area width: " + getWidth(this.contentArea));
-
-        Platform.runLater(() -> {
-            // this.listFilesArea.setPrefWidth(finalWidth);
-            // this.listFilesArea.setMaxWidth(finalWidth);
-            // this.listFilesArea.setPrefHeight(height);
-            // this.listFilesArea.setMaxHeight(height);
-
-            System.out.println("Run later area width: " + getWidth(this.contentArea));
-        });
     }
 
     /**
@@ -253,8 +205,6 @@ public class UiController extends Activity {
 
     @Override
     public void terminate() {
-        configureResizeListener(false);
-
         this.sourceFiles.clear();
         this.destinationFiles.clear();
         this.filesToUpdateMap.clear();
@@ -262,12 +212,7 @@ public class UiController extends Activity {
 
     @Override
     public void postShow() {
-        configureResizeListener(true);
-
         loadFiles();
-        // Platform.runLater(() -> {
-        // contentAreaScroll.setVvalue(0);
-        // });
 
         // TODO bce bce get from Main
         final ToolSettings settings = this.main.getSettings();
@@ -312,7 +257,6 @@ public class UiController extends Activity {
                 Platform.runLater(() -> {
                     listCellFileFactory.setItems(
                             filesToUpdateMap.values().parallelStream().map(file -> new FileInformation(file.getAbsolutePath())).collect(Collectors.toList()));
-                    calculateContentSize();
                 });
 
                 return null;
@@ -320,7 +264,7 @@ public class UiController extends Activity {
         };
 
         fileLoadTask.setOnCancelled(event -> {
-            System.out.println("Execution cancelled.");
+            LOG.info("Execution cancelled.");
             this.loadingInProgress.set(false);
             updateStateProgress("File loading cancelled.");
             FxPlatformHelper.runOnFxThread(() -> {
@@ -328,7 +272,7 @@ public class UiController extends Activity {
             });
         });
         fileLoadTask.setOnFailed(event -> {
-            System.err.println("Task failed: " + fileLoadTask.getException().getMessage());
+            LOG.warning("Task failed: " + fileLoadTask.getException().getMessage());
             fileLoadTask.getException().printStackTrace();
             this.loadingInProgress.set(false);
             updateStateProgress("File loading failed: " + fileLoadTask.getException().getMessage());
@@ -343,9 +287,9 @@ public class UiController extends Activity {
             Platform.runLater(() -> {
                 LOG.info(message);
 
-                labelFileAmountSource.setText(sourceFiles.size() + "");
-                labelFileAmountDestination.setText(destinationFiles.size() + "");
-                labelFileAmountUpdate.setText(filesToUpdateMap.size() + "");
+                labelFileAmountSource.setText(sourceFiles.size() + TextDefinition.EMPTY);
+                labelFileAmountDestination.setText(destinationFiles.size() + TextDefinition.EMPTY);
+                labelFileAmountUpdate.setText(filesToUpdateMap.size() + TextDefinition.EMPTY);
             });
             this.loadingInProgress.set(false);
             updateStateProgress(message);
@@ -353,10 +297,6 @@ public class UiController extends Activity {
 
         // start the task
         this.executor.submit(fileLoadTask);
-
-        // Platform.runLater(() -> {
-        // contentAreaScroll.setVvalue(0);
-        // });
     }
 
     /** Copy the found files in a task. **/
@@ -426,27 +366,5 @@ public class UiController extends Activity {
     @Override
     public ActivityKey getActivityKey() {
         return ActivityKey.UI;
-    }
-
-    /**
-     * Configure or remove the resize listener, depending on the parameter.
-     */
-    private void configureResizeListener(final boolean add) {
-        // TODO bce bce configure listener
-        if (add) {
-            getStage().heightProperty().addListener(contentResizeListener);
-            getStage().widthProperty().addListener(contentResizeListener);
-            // this.listFilesScroll.heightProperty().addListener(contentResizeListener);
-            // this.listFilesScroll.widthProperty().addListener(contentResizeListener);
-            // this.listFilesToUpdate.heightProperty().addListener(contentResizeListener);
-            // this.listFilesToUpdate.widthProperty().addListener(contentResizeListener);
-        } else {
-            getStage().heightProperty().removeListener(contentResizeListener);
-            getStage().widthProperty().removeListener(contentResizeListener);
-            this.listFilesScroll.heightProperty().removeListener(contentResizeListener);
-            this.listFilesScroll.widthProperty().removeListener(contentResizeListener);
-            this.listFilesToUpdate.heightProperty().removeListener(contentResizeListener);
-            this.listFilesToUpdate.widthProperty().removeListener(contentResizeListener);
-        }
     }
 }

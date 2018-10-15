@@ -11,7 +11,7 @@ import javafx.scene.control.ListCell;
 /** A list cell for a file. **/
 public class ListCellFile extends ListCell<FileInformation> {
     /** The width for the status icons. **/
-    private static final double ICON_WIDTH = 120;
+    private static final double ICON_WIDTH = 50;
     /** The information for this cell. **/
     private final FileInformation fileInformation;
 
