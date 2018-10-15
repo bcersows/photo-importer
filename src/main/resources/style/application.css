@@ -5,6 +5,8 @@
 	colorStop: RED;
 	colorWarn: ORANGE;
 	
+	colorHeaderText: WHITE;
+	
 	-fx-font-family: "Montserrat";
 	-fx-font-size: 10pt;
 	
@@ -27,14 +29,25 @@
 	-fx-font-weight: 100;
 }
 
+.jfx-hamburger {
+    -fx-spacing: 5;
+    -fx-cursor: hand;
+}
+.jfx-hamburger StackPane {
+    -fx-pref-width: 20px;
+    -fx-pref-height: 4px;
+    -fx-background-color : colorHeaderText;
+    -fx-background-radius : 5px;
+}
+
 #header {
 	-fx-background-color: colorBc;
-	-fx-font-size: 30pt;
+	-fx-font-size: 20pt;
 	
 	-fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 1), 10, 0, 0, 0);
 }
 #header .label {
-	-fx-text-fill: WHITE;
+	-fx-text-fill: colorHeaderText;
 }
 
 #footer {
@@ -73,11 +86,15 @@
 	-fx-padding: 5px;
 	
 	-fx-min-height: 40pt;
-	-fx-min-width: 300pt;
-	-fx-pref-width: 450pt;
-	-fx-max-width: 450pt;
+	/*-fx-min-width: 300pt;
+	-fx-pref-width: 700pt;*/
+	-fx-max-width: 70pt;
 	
 	-fx-background-color: WHITE;
+}
+#contentArea > .contentContainer.mainContentContainer {
+	-fx-min-width: 500pt;
+	-fx-max-width: 1000pt;
 }
 #contentArea > .contentContainer .contentContainerHeader {
 	-fx-font-size: 14pt;

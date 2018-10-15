@@ -11,9 +11,15 @@ import java.util.Map.Entry;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import com.jfoenix.controls.JFXDrawer;
+import com.jfoenix.controls.JFXDrawersStack;
+import com.jfoenix.controls.JFXHamburger;
 import com.jfoenix.controls.JFXListView;
+import com.jfoenix.controls.JFXScrollPane;
+import com.jfoenix.transitions.hamburger.HamburgerSlideCloseTransition;
 
 import de.bcersows.photoimporter.FileManager;
 import de.bcersows.photoimporter.ToolConstants;
@@ -29,6 +35,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
@@ -36,10 +43,12 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 
 /**
@@ -48,6 +57,11 @@ import javafx.util.Callback;
  * @author BCE
  */
 public class UiController extends Activity {
+    private static final Logger LOG = Logger.getLogger(UiController.class.getName());
+
+    @FXML
+    private BorderPane rootContent;
+
     @FXML
     private Pane headerLoadingIndicator;
     @FXML
@@ -56,7 +70,9 @@ public class UiController extends Activity {
     private Label labelProgressStatus;
 
     @FXML
-    private ScrollPane contentAreaScroll;
+    private VBox centerContent;
+    // @FXML
+    // private ScrollPane contentAreaScroll;
     @FXML
     private FlowPane contentArea;
 
@@ -67,6 +83,10 @@ public class UiController extends Activity {
     @FXML
     private Label labelFileAmountUpdate;
 
+    @FXML
+    private VBox listFilesArea;
+    @FXML
+    private JFXScrollPane listFilesScroll;
     @FXML
     private JFXListView<FileInformation> listFilesToUpdate;
 
@@ -80,6 +100,9 @@ public class UiController extends Activity {
     private Label buttonReloadIcon;
     @FXML
     private Label buttonExitIcon;
+
+    @FXML
+    private JFXHamburger hamburger;
 
     private final StringProperty progressProperty = new SimpleStringProperty();
 
@@ -103,14 +126,48 @@ public class UiController extends Activity {
     private ListCellFileFactory listCellFileFactory;
     private final DateFormat stateProgressDateFormat;
 
+    private final ChangeListener<Number> contentResizeListener = (obs, oldVal, newVal) -> {
+        LOG.warning("Something got resized: stage=" + getStageSize() + ", listFilesScroll=" + getSize(this.listFilesScroll) + ", listFilesToUpdate="
+                + getSize(this.listFilesToUpdate) + ".");
+
+        System.out.println("Detected by " + obs);
+
+        calculateContentSize();
+    };
+
     public UiController() {
         this.fileManager = new FileManager();
 
         this.stateProgressDateFormat = new SimpleDateFormat("HH:mm:ss':' ");
     }
 
+    /**
+     * Calculate and set the size of the content.
+     */
+    private synchronized void calculateContentSize() {
+        final double spacing = 10;
+
+        final double containerWidth = this.listFilesArea.getWidth() - this.listFilesArea.getPadding().getLeft() - this.listFilesArea.getPadding().getRight();
+        final double containerHeight = this.listFilesArea.getHeight() - this.listFilesArea.getPadding().getTop() - this.listFilesArea.getPadding().getBottom();
+
+        final double width = containerWidth - spacing;
+        final double height = containerHeight - spacing;
+
+        LOG.warning("Calculated new size: " + width + "/" + height);
+
+        Platform.runLater(() -> {
+            this.listFilesToUpdate.setPrefWidth(width);
+            this.listFilesToUpdate.setMaxWidth(width);
+            this.listFilesToUpdate.setPrefHeight(height);
+            this.listFilesToUpdate.setMaxHeight(height);
+        });
+    }
+
     @FXML
     private void onActionButtonReload(final ActionEvent actionEvent) {
+        this.listFilesToUpdate.refresh();
+        this.listFilesToUpdate.requestLayout();
+
         loadFiles();
     }
 
@@ -146,11 +203,34 @@ public class UiController extends Activity {
             this.buttonApplyIcon.setText(ToolConstants.ICONS.FA_COPY.code);
             this.buttonReloadIcon.setText(ToolConstants.ICONS.FA_REPEAT.code);
             this.buttonExitIcon.setText(ToolConstants.ICONS.FA_EXIT.code);
+
+            // initialize the hamburger menu
+            final JFXDrawer drawer = new JFXDrawer();
+            drawer.setDefaultDrawerSize(150);
+
+            final JFXDrawersStack drawerStack = new JFXDrawersStack();
+            // drawerStack.setContent(this.rootContent);
+
+            final HamburgerSlideCloseTransition burgerTask = new HamburgerSlideCloseTransition(this.hamburger);
+            burgerTask.setRate(-1);
+            this.hamburger.addEventHandler(MouseEvent.MOUSE_PRESSED, (e) -> {
+                burgerTask.setRate(burgerTask.getRate() * -1);
+                burgerTask.play();
+
+                drawerStack.toggle(drawer);
+            });
+
+            Platform.runLater(() -> {
+                this.listFilesToUpdate.refresh();
+                this.listFilesToUpdate.requestLayout();
+            });
         }
     }
 
     @Override
     public void terminate() {
+        configureResizeListener(false);
+
         this.sourceFiles.clear();
         this.destinationFiles.clear();
         this.filesToUpdateMap.clear();
@@ -158,10 +238,12 @@ public class UiController extends Activity {
 
     @Override
     public void postShow() {
+        configureResizeListener(true);
+
         loadFiles();
-        Platform.runLater(() -> {
-            contentAreaScroll.setVvalue(0);
-        });
+        // Platform.runLater(() -> {
+        // contentAreaScroll.setVvalue(0);
+        // });
 
         // TODO bce bce get from Main
         final ToolSettings settings = this.main.getSettings();
@@ -206,6 +288,7 @@ public class UiController extends Activity {
                 Platform.runLater(() -> {
                     listCellFileFactory.setItems(
                             filesToUpdateMap.values().parallelStream().map(file -> new FileInformation(file.getAbsolutePath())).collect(Collectors.toList()));
+                    calculateContentSize();
                 });
 
                 return null;
@@ -230,11 +313,11 @@ public class UiController extends Activity {
             });
         });
         fileLoadTask.setOnSucceeded(event -> {
-            System.out.println("Source Files: " + sourceFiles);
-            System.out.println("Destination Files: " + destinationFiles);
+            LOG.info("Source Files: " + sourceFiles);
+            LOG.info("Destination Files: " + destinationFiles);
             final String message = "Finished loading. Found " + sourceFiles.size() + " source and " + destinationFiles.size() + " destination files.";
             Platform.runLater(() -> {
-                System.out.println(message);
+                LOG.info(message);
 
                 labelFileAmountSource.setText(sourceFiles.size() + "");
                 labelFileAmountDestination.setText(destinationFiles.size() + "");
@@ -247,9 +330,9 @@ public class UiController extends Activity {
         // start the task
         this.executor.submit(fileLoadTask);
 
-        Platform.runLater(() -> {
-            contentAreaScroll.setVvalue(0);
-        });
+        // Platform.runLater(() -> {
+        // contentAreaScroll.setVvalue(0);
+        // });
     }
 
     /** Copy the found files in a task. **/
@@ -277,19 +360,19 @@ public class UiController extends Activity {
 
                 updateStateProgress("Start copying " + filesToUpdateMap.size() + " files.");
                 final int copied = fileManager.copyFiles(filesToUpdateMap, destinationPath, statusUpdateCallback);
-                System.out.println("Copied: " + copied);
+                LOG.info("Copied: " + copied);
 
                 return null;
             }
         };
 
         copyTask.setOnCancelled(event -> {
-            System.out.println("Execution cancelled.");
+            LOG.info("Execution cancelled.");
             this.loadingInProgress.set(false);
             updateStateProgress("File copying cancelled.");
         });
         copyTask.setOnFailed(event -> {
-            System.err.println("Task failed: " + copyTask.getException().getMessage());
+            LOG.warning("Task failed: " + copyTask.getException().getMessage());
             copyTask.getException().printStackTrace();
             this.loadingInProgress.set(false);
             updateStateProgress("File copying failed: " + copyTask.getException().getMessage());
@@ -312,12 +395,33 @@ public class UiController extends Activity {
                 progressProperty.set(stateProgressDateFormat.format(new Date()) + message);
             });
         } else {
-            System.err.println("It was intended to write a progress message (" + message + "), but it is currently bound otherwise.");
+            LOG.warning("It was intended to write a progress message (" + message + "), but it is currently bound otherwise.");
         }
     }
 
     @Override
     public ActivityKey getActivityKey() {
         return ActivityKey.UI;
+    }
+
+    /**
+     * Configure or remove the resize listener, depending on the parameter.
+     */
+    private void configureResizeListener(final boolean add) {
+        if (add) {
+            getStage().heightProperty().addListener(contentResizeListener);
+            getStage().widthProperty().addListener(contentResizeListener);
+            this.listFilesScroll.heightProperty().addListener(contentResizeListener);
+            this.listFilesScroll.widthProperty().addListener(contentResizeListener);
+            // this.listFilesToUpdate.heightProperty().addListener(contentResizeListener);
+            // this.listFilesToUpdate.widthProperty().addListener(contentResizeListener);
+        } else {
+            getStage().heightProperty().removeListener(contentResizeListener);
+            getStage().widthProperty().removeListener(contentResizeListener);
+            this.listFilesScroll.heightProperty().removeListener(contentResizeListener);
+            this.listFilesScroll.widthProperty().removeListener(contentResizeListener);
+            this.listFilesToUpdate.heightProperty().removeListener(contentResizeListener);
+            this.listFilesToUpdate.widthProperty().removeListener(contentResizeListener);
+        }
     }
 }

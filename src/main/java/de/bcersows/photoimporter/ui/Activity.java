@@ -1,6 +1,8 @@
 package de.bcersows.photoimporter.ui;
 
 import de.bcersows.photoimporter.Main;
+import javafx.scene.layout.Region;
+import javafx.stage.Stage;
 
 /**
  * Activity base class.
@@ -9,8 +11,10 @@ import de.bcersows.photoimporter.Main;
  */
 public abstract class Activity {
     protected Main main = null;
+    private Stage stage;
 
     public Activity() {
+        // empty
     }
 
     /** Initialize this activity. **/
@@ -26,8 +30,43 @@ public abstract class Activity {
     public abstract ActivityKey getActivityKey();
 
     /** Set the main. **/
-    public void setMain(final Main main) {
+    public final void setMain(final Main main) {
         this.main = main;
+    }
+
+    /** Set the stage of the application. **/
+    public final void setStage(final Stage stage) {
+        this.stage = stage;
+    }
+
+    /** Get the stage of the application. **/
+    protected final Stage getStage() {
+        return this.stage;
+    }
+
+    /**
+     * Return the size as String.
+     */
+    protected final String getSize(final Region region) {
+        return getSize(region.getWidth(), region.getHeight());
+    }
+
+    /**
+     * Return the size as String.
+     */
+    protected final String getStageSize() {
+        if (null != getStage()) {
+            return getSize(getStage().getWidth(), getStage().getHeight());
+        } else {
+            return "";
+        }
+    }
+
+    /**
+     * Return the size as String.
+     */
+    protected final String getSize(final double width, final double height) {
+        return "(" + width + "/" + height + ")";
     }
 
     /** The possible activities. **/

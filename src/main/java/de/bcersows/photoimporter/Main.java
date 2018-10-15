@@ -16,6 +16,8 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 public class Main extends Application {
+    private static final String APPLICATION_NAME = "Photo Importer";
+
     private ToolSettings settings;
 
     private final Map<ActivityKey, LoadedActivity> activities = new HashMap<>();
@@ -25,36 +27,37 @@ public class Main extends Application {
     private Scene scene = null;
 
     @Override
-    public void start(final Stage primaryStage) throws Exception {
+    public void start(final Stage stage) throws Exception {
         final Parameters parameters = getParameters();
         this.settings = new ToolSettings(parameters.getRaw().toArray(new String[0]));
 
-        this.primaryStage = primaryStage;
+        this.primaryStage = stage;
 
-        primaryStage.setTitle("Photo Importer");
-        primaryStage.setOnCloseRequest(this::onCloseRequest);
-        primaryStage.setMinHeight(450);
-        primaryStage.setMinWidth(660);
+        stage.setTitle(APPLICATION_NAME);
+        stage.setOnCloseRequest(this::onCloseRequest);
+        stage.setMinHeight(600);
+        stage.setMinWidth(800);
         // primaryStage.initStyle(StageStyle.UNDECORATED);
 
         // load the activities
-        loadActivites();
+        loadActivites(stage);
 
         // show the first -- and only -- activity
         this.showActivity(ActivityKey.UI);
 
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        stage.setScene(scene);
+        stage.show();
     }
 
     /** Load all known activities. **/
-    private void loadActivites() throws Exception {
+    private void loadActivites(final Stage stage) throws Exception {
         // load all activities
         for (final ActivityKey key : ActivityKey.values()) {
             final FXMLLoader sceneLoader = new FXMLLoader(getClass().getResource(key.getFxmlPath()));
             final Class<? extends Activity> clazz = key.getActivityClass();
             final Activity activity = clazz.newInstance();
             activity.setMain(this);
+            activity.setStage(stage);
             sceneLoader.setController(activity);
             final Parent root = sceneLoader.load();
             activity.initialize();
