@@ -45,9 +45,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 
@@ -74,7 +74,7 @@ public class UiController extends Activity {
     // @FXML
     // private ScrollPane contentAreaScroll;
     @FXML
-    private FlowPane contentArea;
+    private BorderPane contentArea;
 
     @FXML
     private Label labelFileAmountSource;
@@ -83,6 +83,8 @@ public class UiController extends Activity {
     @FXML
     private Label labelFileAmountUpdate;
 
+    @FXML
+    private VBox contentSide;
     @FXML
     private VBox listFilesArea;
     @FXML
@@ -127,10 +129,10 @@ public class UiController extends Activity {
     private final DateFormat stateProgressDateFormat;
 
     private final ChangeListener<Number> contentResizeListener = (obs, oldVal, newVal) -> {
-        LOG.warning("Something got resized: stage=" + getStageSize() + ", listFilesScroll=" + getSize(this.listFilesScroll) + ", listFilesToUpdate="
-                + getSize(this.listFilesToUpdate) + ".");
-
-        System.out.println("Detected by " + obs);
+        // LOG.warning("Something got resized: stage=" + getStageSize() + ", listFilesScroll=" + getSize(this.listFilesScroll) + ", listFilesToUpdate="
+        // + getSize(this.listFilesToUpdate) + ".");
+        System.out.println("Something got resized: stage=" + getStageSize() + ", scene=" + getSceneSize() + ", listFilesArea=" + getSize(this.listFilesArea));
+        // System.out.println("Detected by " + obs);
 
         calculateContentSize();
     };
@@ -145,29 +147,51 @@ public class UiController extends Activity {
      * Calculate and set the size of the content.
      */
     private synchronized void calculateContentSize() {
-        final double spacing = 10;
+        // TODO bce bce calculate size
+        // final double spacing = 10;
+        final double stageWidth = getStage().getWidth();
+        final double stageHeight = getStage().getHeight();
 
-        final double containerWidth = this.listFilesArea.getWidth() - this.listFilesArea.getPadding().getLeft() - this.listFilesArea.getPadding().getRight();
-        final double containerHeight = this.listFilesArea.getHeight() - this.listFilesArea.getPadding().getTop() - this.listFilesArea.getPadding().getBottom();
+        final double sceneWidth = getScene().getWidth();
 
-        final double width = containerWidth - spacing;
-        final double height = containerHeight - spacing;
+        final double parentWidth = getWidth(this.contentArea);
+        final double sidebarWidth = this.contentSide.getWidth();
+        final double containerWidth = getWidth(this.listFilesArea);
+        final double containerHeight = this.contentArea.getHeight() - this.contentArea.getPadding().getTop() - this.contentArea.getPadding().getBottom();
 
-        LOG.warning("Calculated new size: " + width + "/" + height);
+        double width = parentWidth - sidebarWidth;
+        if (width > stageWidth) {
+            width = stageWidth - sidebarWidth;
+        }
+
+        final double height = containerHeight;
+
+        final double finalWidth = width;
+
+        LOG.warning("Calculated new size: " + finalWidth + "/" + height);
+
+        System.out.println("Inside area width: " + getWidth(this.contentArea));
 
         Platform.runLater(() -> {
-            this.listFilesToUpdate.setPrefWidth(width);
-            this.listFilesToUpdate.setMaxWidth(width);
-            this.listFilesToUpdate.setPrefHeight(height);
-            this.listFilesToUpdate.setMaxHeight(height);
+            // this.listFilesArea.setPrefWidth(finalWidth);
+            // this.listFilesArea.setMaxWidth(finalWidth);
+            // this.listFilesArea.setPrefHeight(height);
+            // this.listFilesArea.setMaxHeight(height);
+
+            System.out.println("Run later area width: " + getWidth(this.contentArea));
         });
+    }
+
+    /**
+     * @param region
+     * @return
+     */
+    private double getWidth(final Region region) {
+        return region.getWidth() - region.getPadding().getLeft() - region.getPadding().getRight();
     }
 
     @FXML
     private void onActionButtonReload(final ActionEvent actionEvent) {
-        this.listFilesToUpdate.refresh();
-        this.listFilesToUpdate.requestLayout();
-
         loadFiles();
     }
 
@@ -408,11 +432,12 @@ public class UiController extends Activity {
      * Configure or remove the resize listener, depending on the parameter.
      */
     private void configureResizeListener(final boolean add) {
+        // TODO bce bce configure listener
         if (add) {
             getStage().heightProperty().addListener(contentResizeListener);
             getStage().widthProperty().addListener(contentResizeListener);
-            this.listFilesScroll.heightProperty().addListener(contentResizeListener);
-            this.listFilesScroll.widthProperty().addListener(contentResizeListener);
+            // this.listFilesScroll.heightProperty().addListener(contentResizeListener);
+            // this.listFilesScroll.widthProperty().addListener(contentResizeListener);
             // this.listFilesToUpdate.heightProperty().addListener(contentResizeListener);
             // this.listFilesToUpdate.widthProperty().addListener(contentResizeListener);
         } else {

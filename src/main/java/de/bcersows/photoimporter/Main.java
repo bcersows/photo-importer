@@ -77,6 +77,7 @@ public class Main extends Application {
 
         this.currentActivity = activity.getActivity();
         scene.setRoot(activity.getRoot());
+        this.currentActivity.setScene(scene);
         this.currentActivity.postShow();
     }
 

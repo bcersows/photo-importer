@@ -1,6 +1,7 @@
 package de.bcersows.photoimporter.ui;
 
 import de.bcersows.photoimporter.Main;
+import javafx.scene.Scene;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 
@@ -12,6 +13,7 @@ import javafx.stage.Stage;
 public abstract class Activity {
     protected Main main = null;
     private Stage stage;
+    private Scene scene;
 
     public Activity() {
         // empty
@@ -45,6 +47,17 @@ public abstract class Activity {
     }
 
     /**
+     * @param scene
+     */
+    public void setScene(final Scene scene) {
+        this.scene = scene;
+    }
+
+    protected Scene getScene() {
+        return this.scene;
+    }
+
+    /**
      * Return the size as String.
      */
     protected final String getSize(final Region region) {
@@ -52,11 +65,22 @@ public abstract class Activity {
     }
 
     /**
-     * Return the size as String.
+     * Return the size of the stage as String.
      */
     protected final String getStageSize() {
         if (null != getStage()) {
             return getSize(getStage().getWidth(), getStage().getHeight());
+        } else {
+            return "";
+        }
+    }
+
+    /**
+     * Return the size of the scene as String.
+     */
+    protected final String getSceneSize() {
+        if (null != getScene()) {
+            return getSize(getScene().getWidth(), getScene().getHeight());
         } else {
             return "";
         }

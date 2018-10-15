@@ -84,17 +84,12 @@
 
 #contentArea > .contentContainer {
 	-fx-padding: 5px;
-	
 	-fx-min-height: 40pt;
-	/*-fx-min-width: 300pt;
-	-fx-pref-width: 700pt;*/
-	-fx-max-width: 70pt;
 	
-	-fx-background-color: WHITE;
+	-fx-background-color: colorBackground;
 }
 #contentArea > .contentContainer.mainContentContainer {
-	-fx-min-width: 500pt;
-	-fx-max-width: 1000pt;
+	-fx-min-width: 300pt;
 }
 #contentArea > .contentContainer .contentContainerHeader {
 	-fx-font-size: 14pt;
