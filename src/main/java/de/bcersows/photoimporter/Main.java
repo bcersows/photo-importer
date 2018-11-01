@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+
 import de.bcersows.photoimporter.model.LoadedActivity;
 import de.bcersows.photoimporter.model.ToolSettings;
 import de.bcersows.photoimporter.ui.Activity;
@@ -29,6 +32,9 @@ public class Main extends Application {
     private Stage primaryStage = null;
     private Scene scene = null;
 
+    /** The Guice injector. **/
+    private Injector injector;
+
     @Override
     public void start(final Stage stage) throws Exception {
         final Parameters parameters = getParameters();
@@ -42,8 +48,10 @@ public class Main extends Application {
         stage.setMinWidth(800);
         // primaryStage.initStyle(StageStyle.UNDECORATED);
 
+        injector = Guice.createInjector(new ApplicationConfig());
+
         // load the activities
-        loadActivites(stage);
+        loadActivities(injector);
 
         // show the first -- and only -- activity
         this.showActivity(ActivityKey.UI);
@@ -52,13 +60,18 @@ public class Main extends Application {
         stage.show();
     }
 
-    /** Load all known activities. **/
-    private void loadActivites(final Stage stage) throws Exception {
+    /**
+     * Load all known activities.
+     * 
+     * @param injector
+     *            the injector used to load the activities
+     **/
+    private void loadActivities(final Injector injector) throws Exception {
         // load all activities
         for (final ActivityKey key : ActivityKey.values()) {
             final FXMLLoader sceneLoader = new FXMLLoader(getClass().getResource(key.getFxmlPath()));
             final Class<? extends Activity> clazz = key.getActivityClass();
-            final Activity activity = clazz.newInstance();
+            final Activity activity = injector.getInstance(clazz);
             activity.setMain(this);
             sceneLoader.setController(activity);
             final Parent root = sceneLoader.load();

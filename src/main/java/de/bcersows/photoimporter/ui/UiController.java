@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import com.google.inject.Inject;
 import com.jfoenix.controls.JFXDrawer;
 import com.jfoenix.controls.JFXDrawersStack;
 import com.jfoenix.controls.JFXHamburger;
@@ -21,9 +22,11 @@ import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXScrollPane;
 import com.jfoenix.transitions.hamburger.HamburgerSlideCloseTransition;
 
+import de.bcersows.photoimporter.ApplicationEventManager;
 import de.bcersows.photoimporter.FileManager;
 import de.bcersows.photoimporter.ToolConstants;
 import de.bcersows.photoimporter.helper.FxPlatformHelper;
+import de.bcersows.photoimporter.model.ApplicationEventType;
 import de.bcersows.photoimporter.model.CopyInformation;
 import de.bcersows.photoimporter.model.FileException;
 import de.bcersows.photoimporter.model.FileInformation;
@@ -47,7 +50,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 
@@ -58,6 +60,9 @@ import javafx.util.Callback;
  */
 public class UiController extends Activity {
     private static final Logger LOG = Logger.getLogger(UiController.class.getName());
+
+    /** Format for the progress time. **/
+    private static final String PROGRESS_DATE_FORMAT = "HH:mm:ss':' ";
 
     @FXML
     private BorderPane rootContent;
@@ -108,7 +113,11 @@ public class UiController extends Activity {
 
     private final StringProperty progressProperty = new SimpleStringProperty();
 
+    /** Manager for file-based operations. **/
     private final FileManager fileManager;
+    /** Logging manager. **/
+    private final ApplicationEventManager eventManager;
+
     /** Store the found source files. **/
     private final Map<String, File> sourceFiles = new HashMap<>();
     /** Store the found destination files. **/
@@ -116,7 +125,9 @@ public class UiController extends Activity {
     /** Also store the files to update. **/
     private final ObservableMap<String, File> filesToUpdateMap = FXCollections.observableHashMap();
 
+    /** The source paths for the copy process. **/
     private List<String> sourcePaths;
+    /** The destination path for the copy process. **/
     private String destinationPath;
 
     private ScheduledExecutorService executor;
@@ -128,18 +139,12 @@ public class UiController extends Activity {
     private ListCellFileFactory listCellFileFactory;
     private final DateFormat stateProgressDateFormat;
 
-    public UiController() {
-        this.fileManager = new FileManager();
+    @Inject
+    public UiController(final FileManager fileManager, final ApplicationEventManager eventManager) {
+        this.fileManager = fileManager;
+        this.eventManager = eventManager;
 
-        this.stateProgressDateFormat = new SimpleDateFormat("HH:mm:ss':' ");
-    }
-
-    /**
-     * @param region
-     * @return
-     */
-    private double getWidth(final Region region) {
-        return region.getWidth() - region.getPadding().getLeft() - region.getPadding().getRight();
+        this.stateProgressDateFormat = new SimpleDateFormat(PROGRESS_DATE_FORMAT);
     }
 
     @FXML
@@ -354,9 +359,12 @@ public class UiController extends Activity {
 
     /** Set the progress property to the given message. **/
     private void updateStateProgress(final String message) {
+        // can only set it when not bound already
         if (false == progressProperty.isBound()) {
+            final String finalMessage = stateProgressDateFormat.format(new Date()) + message;
+            eventManager.addEvent(new Date(), message, ApplicationEventType.COPY);
             Platform.runLater(() -> {
-                progressProperty.set(stateProgressDateFormat.format(new Date()) + message);
+                progressProperty.set(finalMessage);
             });
         } else {
             LOG.warning("It was intended to write a progress message (" + message + "), but it is currently bound otherwise.");
