@@ -67,6 +67,19 @@ public class UiController extends Activity {
     @FXML
     private BorderPane rootContent;
 
+    // nav area
+    /** Just stores the nav entries temporarily to be able to use them with SceneBuilder. **/
+    @FXML
+    private Pane navStorage;
+    @FXML
+    private JFXDrawersStack drawersStack;
+    @FXML
+    private JFXDrawer navPanel;
+    @FXML
+    private VBox navPanelContent;
+    @FXML
+    private JFXHamburger hamburger;
+
     @FXML
     private Pane headerLoadingIndicator;
     @FXML
@@ -108,9 +121,6 @@ public class UiController extends Activity {
     @FXML
     private Label buttonExitIcon;
 
-    @FXML
-    private JFXHamburger hamburger;
-
     private final StringProperty progressProperty = new SimpleStringProperty();
 
     /** Manager for file-based operations. **/
@@ -122,7 +132,7 @@ public class UiController extends Activity {
     private final Map<String, File> sourceFiles = new HashMap<>();
     /** Store the found destination files. **/
     private final Map<String, File> destinationFiles = new HashMap<>();
-    /** Also store the files to update. **/
+    /** Stores the files to update. **/
     private final ObservableMap<String, File> filesToUpdateMap = FXCollections.observableHashMap();
 
     /** The source paths for the copy process. **/
@@ -186,19 +196,21 @@ public class UiController extends Activity {
             this.buttonExitIcon.setText(ToolConstants.ICONS.FA_EXIT.code);
 
             // initialize the hamburger menu
-            final JFXDrawer drawer = new JFXDrawer();
-            drawer.setDefaultDrawerSize(150);
-
-            final JFXDrawersStack drawerStack = new JFXDrawersStack();
-            // drawerStack.setContent(this.rootContent);
+            this.navStorage.getChildren().remove(this.drawersStack);
+            this.navStorage.getChildren().remove(this.navPanel);
+            this.rootContent.setCenter(this.drawersStack);
+            this.rootContent.getChildren().remove(centerContent);
+            this.drawersStack.setContent(centerContent);
+            this.rootContent.setLeft(null);
+            this.navPanel.setSidePane(this.navPanelContent);
 
             final HamburgerSlideCloseTransition burgerTask = new HamburgerSlideCloseTransition(this.hamburger);
             burgerTask.setRate(-1);
-            this.hamburger.addEventHandler(MouseEvent.MOUSE_PRESSED, (e) -> {
+            this.hamburger.addEventHandler(MouseEvent.MOUSE_PRESSED, e -> {
                 burgerTask.setRate(burgerTask.getRate() * -1);
                 burgerTask.play();
 
-                drawerStack.toggle(drawer);
+                drawersStack.toggle(navPanel);
             });
 
             Platform.runLater(() -> {
