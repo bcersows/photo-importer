@@ -1,6 +1,7 @@
 package de.bcersows.photoimporter;
 
-import java.util.HashMap;
+import java.io.IOException;
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -19,36 +20,49 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
+/**
+ * Starts the importer, loads all other activities.
+ * 
+ * @author BCE
+ */
 public class Main extends Application {
     private static final Logger LOG = Logger.getLogger(Main.class.getName());
     /** The name of the application. **/
     private static final String APPLICATION_NAME = "Photo Importer";
+    /** The min height of the application. **/
+    private static final double WINDOW_MIN_HEIGHT = 600;
+    /** The min width of the application. **/
+    private static final double WINDOW_MIN_WIDTH = 800;
 
     private ToolSettings settings;
 
-    private final Map<ActivityKey, LoadedActivity> activities = new HashMap<>();
-    private Activity currentActivity = null;
+    private final Map<ActivityKey, LoadedActivity> activities = new EnumMap<>(ActivityKey.class);
+    private Activity currentActivity;
 
-    private Stage primaryStage = null;
-    private Scene scene = null;
+    private ApplicationEventManager applicationEventManager;
+
+    // private Stage primaryStage ;
+    private Scene scene;
 
     /** The Guice injector. **/
-    private Injector injector;
+    // private Injector injector;
 
     @Override
     public void start(final Stage stage) throws Exception {
+        this.applicationEventManager = new ApplicationEventManager();
+
         final Parameters parameters = getParameters();
         this.settings = new ToolSettings(parameters.getRaw().toArray(new String[0]));
 
-        this.primaryStage = stage;
+        // this.primaryStage = stage;
 
         stage.setTitle(APPLICATION_NAME);
         stage.setOnCloseRequest(this::onCloseRequest);
-        stage.setMinHeight(600);
-        stage.setMinWidth(800);
-        // primaryStage.initStyle(StageStyle.UNDECORATED);
+        stage.setMinHeight(WINDOW_MIN_HEIGHT);
+        stage.setMinWidth(WINDOW_MIN_WIDTH);
+        // stage.initStyle(StageStyle.UNDECORATED);
 
-        injector = Guice.createInjector(new ApplicationConfig());
+        final Injector injector = Guice.createInjector(new ApplicationConfig(applicationEventManager));
 
         // load the activities
         loadActivities(injector);
@@ -66,7 +80,7 @@ public class Main extends Application {
      * @param injector
      *            the injector used to load the activities
      **/
-    private void loadActivities(final Injector injector) throws Exception {
+    private void loadActivities(final Injector injector) throws IOException {
         // load all activities
         for (final ActivityKey key : ActivityKey.values()) {
             final FXMLLoader sceneLoader = new FXMLLoader(getClass().getResource(key.getFxmlPath()));
@@ -88,31 +102,33 @@ public class Main extends Application {
         terminateCurrentActivity();
 
         final LoadedActivity activity = this.activities.get(key);
-        final Scene scene = getScene(activity.getRoot());
+        final Scene rootScene = getScene(activity.getRoot());
 
         this.currentActivity = activity.getActivity();
-        scene.setRoot(activity.getRoot());
+        rootScene.setRoot(activity.getRoot());
         this.currentActivity.postShow();
     }
 
     /** Get the scene or create a new one. **/
     private Scene getScene(final Parent root) {
         if (null == this.scene) {
-            final Scene scene = new Scene(root);
-            scene.getStylesheets().add(getClass().getResource("/style/application.css").toExternalForm());
+            final Scene rootScene = new Scene(root);
+            rootScene.getStylesheets().add(getClass().getResource("/style/application.css").toExternalForm());
 
             Font.loadFont(getClass().getResource("/fonts/fa-solid-900.ttf").toExternalForm(), 36);
             Font.loadFont(getClass().getResource("/fonts/Montserrat-Regular.ttf").toExternalForm(), 36);
             Font.loadFont(getClass().getResource("/fonts/Montserrat-Medium.ttf").toExternalForm(), 36);
-            this.scene = scene;
+            this.scene = rootScene;
         }
 
         return this.scene;
     }
 
-    /** The close request. **/
+    /** The close request, shutting down and clearing up everything. **/
     public void onCloseRequest(final WindowEvent windowEvent) {
         terminateCurrentActivity();
+        this.applicationEventManager.shutdown();
+
         LOG.info("Shutting down!");
 
         if (null != windowEvent) {

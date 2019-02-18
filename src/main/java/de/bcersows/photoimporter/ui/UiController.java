@@ -360,7 +360,7 @@ public class UiController extends Activity {
     /** Set the progress property to the given message. **/
     private void updateStateProgress(final String message) {
         // can only set it when not bound already
-        if (false == progressProperty.isBound()) {
+        if (!progressProperty.isBound()) {
             final String finalMessage = stateProgressDateFormat.format(new Date()) + message;
             eventManager.addEvent(new Date(), message, ApplicationEventType.COPY);
             Platform.runLater(() -> {

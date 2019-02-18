@@ -11,6 +11,7 @@ import de.bcersows.photoimporter.model.ApplicationEvent;
 import de.bcersows.photoimporter.model.ApplicationEventType;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
+import javafx.collections.FXCollections;
 
 /**
  * Manager for logging events for the user.
@@ -23,7 +24,7 @@ public class ApplicationEventManager {
 
     /** Create the manager. **/
     public ApplicationEventManager() {
-        this.events = new ReadOnlyListWrapper<>();
+        this.events = new ReadOnlyListWrapper<>(FXCollections.observableArrayList());
     }
 
     /**
@@ -56,6 +57,11 @@ public class ApplicationEventManager {
     /** Return the collected events. **/
     public ReadOnlyListProperty<ApplicationEvent> getEvents() {
         return this.events.getReadOnlyProperty();
+    }
+
+    /** Shuts down the event manager. **/
+    public void shutdown() {
+        this.events.clear();
     }
 
 }
