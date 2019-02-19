@@ -8,10 +8,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.bcersows.photoimporter.model.CopyInformation;
 import de.bcersows.photoimporter.model.FileException;
@@ -23,7 +24,7 @@ import javafx.util.Callback;
  * @author BCE
  */
 public class FileManager {
-    private static final Logger LOG = Logger.getLogger(FileManager.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(FileManager.class);
 
     private static final String FILE_TYPE_GIF = "gif";
     private static final String FILE_TYPE_PNG = "png";

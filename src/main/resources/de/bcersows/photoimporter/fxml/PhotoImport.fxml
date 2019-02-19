@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXListView?>
+<?import com.jfoenix.controls.JFXScrollPane?>
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:id="photoImport" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <HBox fx:id="areaProgress" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" prefHeight="35.0" spacing="5.0" VBox.vgrow="NEVER">
+            <children>
+                <Label fx:id="labelProgressStatus" maxWidth="1.7976931348623157E308" text="[progress]" HBox.hgrow="ALWAYS">
+                    <HBox.margin>
+                        <Insets left="5.0" />
+                    </HBox.margin>
+                </Label>
+                <Pane fx:id="headerLoadingIndicator" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="30.0" styleClass="loading-icon">
+                    <effect>
+                        <DropShadow />
+                    </effect>
+                </Pane>
+            </children>
+        </HBox>
+        <BorderPane fx:id="contentArea" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" VBox.vgrow="ALWAYS">
+            <left>
+                <VBox fx:id="contentSide" minHeight="-Infinity" minWidth="-Infinity" spacing="5.0" styleClass="contentContainer" BorderPane.alignment="CENTER">
+                    <children>
+                        <Label styleClass="contentContainerHeader" text="STATUS" />
+                        <HBox spacing="10.0">
+                            <children>
+                                <Label text="Source file amount:" />
+                                <Label fx:id="labelFileAmountSource" text="0" />
+                            </children>
+                        </HBox>
+                        <HBox layoutX="10.0" layoutY="27.0" spacing="10.0">
+                            <children>
+                                <Label text="Destination file amount:" />
+                                <Label fx:id="labelFileAmountDestination" text="0" />
+                            </children>
+                        </HBox>
+                        <HBox layoutX="10.0" layoutY="44.0" spacing="10.0">
+                            <children>
+                                <Label text="To update:" />
+                                <Label fx:id="labelFileAmountUpdate" text="0" />
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </left>
+            <center>
+                <VBox fx:id="listFilesArea" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" BorderPane.alignment="CENTER">
+                    <children>
+                        <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" styleClass="contentContainerHeader" text="TO COPY" VBox.vgrow="NEVER" />
+                        <JFXScrollPane fx:id="listFilesScroll" alignment="TOP_LEFT" minHeight="-Infinity" minWidth="-Infinity" style="-fx-background-color: GREEN;" VBox.vgrow="ALWAYS">
+                            <children>
+                                <JFXListView fx:id="listFilesToUpdate" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" showTooltip="true" />
+                            </children>
+                        </JFXScrollPane>
+                    </children>
+                    <styleClass>
+                        <String fx:value="contentContainer" />
+                        <String fx:value="mainContentContainer" />
+                    </styleClass>
+                </VBox>
+            </center>
+        </BorderPane>
+    </children>
+</VBox>

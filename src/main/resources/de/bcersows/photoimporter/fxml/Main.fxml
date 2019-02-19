@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXDrawer?>
+<?import com.jfoenix.controls.JFXDrawersStack?>
+<?import com.jfoenix.controls.JFXHamburger?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane fx:id="rootContent" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" stylesheets="@../style/application.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+    <top>
+        <HBox fx:id="header" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="50.0" prefWidth="600.0" spacing="20.0" BorderPane.alignment="TOP_LEFT">
+            <children>
+                <JFXHamburger fx:id="hamburger" alignment="CENTER" maxHeight="-Infinity" prefHeight="40.0" HBox.hgrow="NEVER" />
+                <Label maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="40.0" text="Photo Import Tool" HBox.hgrow="ALWAYS" />
+            </children>
+            <BorderPane.margin>
+                <Insets />
+            </BorderPane.margin>
+            <padding>
+                <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
+            </padding>
+        </HBox>
+    </top>
+    <bottom>
+        <HBox fx:id="footer" alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="60.0" spacing="10.0" BorderPane.alignment="CENTER">
+            <children>
+                <JFXButton fx:id="buttonReload" buttonType="RAISED" onAction="#onActionButtonReload" text="RELOAD">
+                    <graphic>
+                        <Label fx:id="buttonReloadIcon" styleClass="fontAwesome" />
+                    </graphic>
+                </JFXButton>
+                <Pane HBox.hgrow="ALWAYS" />
+                <JFXButton fx:id="buttonApply" buttonType="RAISED" onAction="#onActionButtonApply" text="COPY">
+                    <graphic>
+                        <Label fx:id="buttonApplyIcon" styleClass="fontAwesome" />
+                    </graphic>
+                </JFXButton>
+                <JFXButton fx:id="buttonExit" buttonType="RAISED" onAction="#onActionButtonExit" text="EXIT">
+                    <graphic>
+                        <Label fx:id="buttonExitIcon" styleClass="fontAwesome" />
+                    </graphic>
+                </JFXButton>
+            </children>
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+            </padding>
+        </HBox>
+    </bottom>
+    <left>
+        <Pane fx:id="navStorage" BorderPane.alignment="CENTER">
+            <children>
+                <JFXDrawersStack fx:id="drawersStack" />
+                <JFXDrawer fx:id="navPanel" defaultDrawerSize="200.0">
+                    <children>
+                        <VBox fx:id="navPanelContent" spacing="20.0">
+                            <children>
+                                <JFXButton fx:id="buttonNavMain" buttonType="RAISED" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" ripplerFill="#d74f4f" text="MAIN" textAlignment="CENTER" />
+                                <JFXButton fx:id="buttonNavEvents" buttonType="RAISED" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="EVENTS" textAlignment="CENTER" />
+                            </children>
+                            <padding>
+                                <Insets bottom="10.0" top="10.0" />
+                            </padding>
+                        </VBox>
+                    </children>
+                </JFXDrawer>
+            </children>
+        </Pane>
+    </left>
+    <center>
+      <VBox fx:id="centerContent" alignment="CENTER" BorderPane.alignment="CENTER">
+         <children>
+            <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="CONTENT WILL BE LOADED TO HERE!" textAlignment="CENTER" wrapText="true" VBox.vgrow="ALWAYS" />
+         </children>
+      </VBox>
+    </center>
+</BorderPane>

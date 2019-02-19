@@ -1,10 +1,12 @@
 package de.bcersows.photoimporter.ui;
 
-import de.bcersows.photoimporter.Main;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import de.bcersows.photoimporter.model.ToolSettings;
 import de.bcersows.photoimporter.texts.TextDefinition;
-import javafx.scene.Scene;
+import javafx.fxml.FXML;
 import javafx.scene.layout.Region;
-import javafx.stage.Stage;
 
 /**
  * Activity base class.
@@ -12,29 +14,46 @@ import javafx.stage.Stage;
  * @author BCE
  */
 public abstract class Activity {
-    protected Main main = null;
-    private Stage stage;
-    private Scene scene;
+    /** UI controller for the scene. **/
+    protected final UiController uiController;
 
-    public Activity() {
-        // empty
+    /**
+     * Create base class.
+     */
+    public Activity(@Nonnull final UiController uiController) {
+        this.uiController = uiController;
     }
 
     /** Initialize this activity. **/
+    @FXML
     public abstract void initialize();
 
     /** Terminate this activity. **/
     public abstract void terminate();
 
-    /** Run after activity was shown, e.g. to collect data. **/
-    public abstract void postShow();
+    /** Run after activity was shown, e.g. to collect data. Activity override. **/
+    protected abstract void postShowActivity();
 
     /** Get the key of this activity. **/
     public abstract ActivityKey getActivityKey();
 
-    /** Set the main. **/
-    public final void setMain(final Main main) {
-        this.main = main;
+    /** Return the action to set to apply button. **/
+    @Nullable
+    protected abstract Runnable getButtonActionApply();
+
+    /** Return the action to set to retry button. **/
+    @Nullable
+    protected abstract Runnable getButtonActionRetry();
+
+    /** Run after activity was shown, e.g. to collect data. **/
+    public final void postShow() {
+        this.uiController.setButtonActions(getButtonActionApply(), getButtonActionRetry());
+        this.postShowActivity();
+    }
+
+    /** Get the application settings. **/
+    protected final ToolSettings getApplicationSettings() {
+        return this.uiController.getApplicationSettings();
     }
 
     /**
@@ -53,7 +72,10 @@ public abstract class Activity {
 
     /** The possible activities. **/
     public enum ActivityKey {
-        UI(UiController.class, "/fxml/Main.fxml");
+        /** Import photos. **/
+        IMPORT(PhotoImportController.class, "/fxml/PhotoImport.fxml"),
+        /** Show list of events. **/
+        EVENTS(PhotoImportController.class, "/fxml/PhotoImport.fxml");
 
         private final Class<? extends Activity> activityClass;
         private final String fxmlPath;

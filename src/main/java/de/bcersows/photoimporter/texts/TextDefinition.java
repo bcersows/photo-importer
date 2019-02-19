@@ -8,7 +8,11 @@ package de.bcersows.photoimporter.texts;
  * 
  * @author BCE
  */
-public class TextDefinition {
+public final class TextDefinition {
+    private TextDefinition() {
+        // nothing
+    }
+
     public static final String EMPTY = "";
     public static final String SLASH = "/";
     public static final String BRACKET_OPEN = "(";

@@ -2,9 +2,10 @@ package de.bcersows.photoimporter.ui.components;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.bcersows.photoimporter.helper.FxPlatformHelper;
 import de.bcersows.photoimporter.model.FileInformation;
@@ -21,7 +22,7 @@ import javafx.util.Callback;
  * @author BCE
  */
 public class ListCellFileFactory implements Callback<ListView<FileInformation>, ListCell<FileInformation>> {
-    private static final Logger LOG = Logger.getLogger(ListCellFileFactory.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(ListCellFileFactory.class);
 
     private final ListProperty<FileInformation> items = new SimpleListProperty<FileInformation>(
             FXCollections.observableList(new LinkedList<FileInformation>()));
@@ -41,7 +42,7 @@ public class ListCellFileFactory implements Callback<ListView<FileInformation>, 
 
     /** Set the items of the list. **/
     public void setItems(final List<FileInformation> items) {
-        LOG.info("Set " + items.size() + " items.");
+        LOG.info("Set {} items.", items.size());
         this.items.get().setAll(items);
     }
 

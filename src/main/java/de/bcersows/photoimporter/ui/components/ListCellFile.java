@@ -5,7 +5,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.bcersows.photoimporter.ToolConstants;
 import de.bcersows.photoimporter.model.FileInformation;
@@ -19,7 +21,7 @@ import javafx.scene.layout.HBox;
 
 /** A list cell for a file. **/
 public class ListCellFile extends ListCell<FileInformation> {
-    private static final Logger LOG = Logger.getLogger(ListCellFile.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(ListCellFile.class);
 
     /** If an image preview shall be loaded. Will use a lot of memory. **/
     private static final boolean LOAD_IMAGE = false;
@@ -73,7 +75,7 @@ public class ListCellFile extends ListCell<FileInformation> {
                 graphicContent.getChildren().add(imageView);
                 width += IMAGE_SIZE;
             } catch (IllegalArgumentException | NullPointerException | IOException e) {
-                LOG.warning("Could not load image: " + e.getMessage());
+                LOG.warn("Could not load image: {}", e.getMessage(), e);
             }
         }
 
