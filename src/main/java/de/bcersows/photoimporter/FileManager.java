@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -16,7 +17,6 @@ import org.slf4j.LoggerFactory;
 
 import de.bcersows.photoimporter.model.CopyInformation;
 import de.bcersows.photoimporter.model.FileException;
-import javafx.util.Callback;
 
 /**
  * Manager for all the file handling.
@@ -81,7 +81,7 @@ public class FileManager {
     }
 
     /** Copy the provided files to the given destination folder path. **/
-    public int copyFiles(final Map<String, File> filesToUpdate, final String destinationPath, final Callback<CopyInformation, Void> statusUpdateCallback)
+    public int copyFiles(final Map<String, File> filesToUpdate, final String destinationPath, final Consumer<CopyInformation> statusUpdateCallback)
             throws IOException {
         final int amount = 0;
 
@@ -94,7 +94,7 @@ public class FileManager {
         for (final File file : filesToUpdate.values()) {
             final String msg = "Copying " + file.getAbsolutePath() + "...";
             LOG.info(msg);
-            statusUpdateCallback.call(new CopyInformation(file.getAbsolutePath(), true, msg));
+            statusUpdateCallback.accept(new CopyInformation(file.getAbsolutePath(), true, msg));
 
             // TODO bce bce maybe catch some exceptions and set the success state to false?
             FileUtils.copyFileToDirectory(file, destDir);

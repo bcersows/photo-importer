@@ -75,7 +75,7 @@ public abstract class Activity {
         /** Import photos. **/
         IMPORT(PhotoImportController.class, "/fxml/PhotoImport.fxml"),
         /** Show list of events. **/
-        EVENTS(PhotoImportController.class, "/fxml/PhotoImport.fxml");
+        EVENTS(EventsController.class, "/fxml/Events.fxml");
 
         private final Class<? extends Activity> activityClass;
         private final String fxmlPath;

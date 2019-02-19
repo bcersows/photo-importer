@@ -38,8 +38,6 @@ public class Main extends Application {
     private static final double WINDOW_MIN_WIDTH = 800;
     /** Path to the CSS file. **/
     private static final String CSS_PATH = "/style/application.css";
-    /** Resource base path. Should be removed ASAP... **/
-    private static final String RESOURCE_BASE_PATH = "/main/resources/de/bcersows/photoimporter/";
 
     private ToolSettings settings;
 
@@ -92,7 +90,7 @@ public class Main extends Application {
      **/
     private void loadActivities(final Injector injector) throws IOException {
         // need to load main first
-        final FXMLLoader uiSceneLoader = new FXMLLoader(getClass().getResource(RESOURCE_BASE_PATH + "fxml/Main.fxml"));
+        final FXMLLoader uiSceneLoader = new FXMLLoader(getClass().getResource("/fxml/Main.fxml"));
         uiController = injector.getInstance(UiController.class);
         uiController.setMain(this);
         uiSceneLoader.setController(uiController);
@@ -103,7 +101,7 @@ public class Main extends Application {
 
         // load all activities
         for (final ActivityKey key : ActivityKey.values()) {
-            final FXMLLoader sceneLoader = new FXMLLoader(getClass().getResource(RESOURCE_BASE_PATH + key.getFxmlPath()));
+            final FXMLLoader sceneLoader = new FXMLLoader(getClass().getResource(key.getFxmlPath()));
             final Class<? extends Activity> clazz = key.getActivityClass();
             final Activity activity = injector.getInstance(clazz);
             sceneLoader.setController(activity);
@@ -130,11 +128,11 @@ public class Main extends Application {
     private Scene createScene(final Parent root) {
         if (null == this.scene) {
             final Scene rootScene = new Scene(root);
-            rootScene.getStylesheets().add(getClass().getResource(RESOURCE_BASE_PATH + CSS_PATH).toExternalForm());
+            rootScene.getStylesheets().add(getClass().getResource(CSS_PATH).toExternalForm());
 
-            Font.loadFont(getClass().getResource(RESOURCE_BASE_PATH + "/fonts/fa-solid-900.ttf").toExternalForm(), 36);
-            Font.loadFont(getClass().getResource(RESOURCE_BASE_PATH + "/fonts/Montserrat-Regular.ttf").toExternalForm(), 36);
-            Font.loadFont(getClass().getResource(RESOURCE_BASE_PATH + "/fonts/Montserrat-Medium.ttf").toExternalForm(), 36);
+            Font.loadFont(getClass().getResource("/fonts/fa-solid-900.ttf").toExternalForm(), 36);
+            Font.loadFont(getClass().getResource("/fonts/Montserrat-Regular.ttf").toExternalForm(), 36);
+            Font.loadFont(getClass().getResource("/fonts/Montserrat-Medium.ttf").toExternalForm(), 36);
             this.scene = rootScene;
         }
 

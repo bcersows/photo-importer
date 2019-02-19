@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -49,7 +50,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.util.Callback;
 
 /**
  * @author BCE
@@ -203,13 +203,10 @@ public class PhotoImportController extends Activity {
                     throw e;
                 }
 
-                filesToUpdateMap.putAll(sourceFiles.entrySet().parallelStream().filter(entry -> {
-                    return !destinationFiles.containsKey(entry.getKey());
-                }).collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
-                Platform.runLater(() -> {
-                    listCellFileFactory.setItems(
-                            filesToUpdateMap.values().parallelStream().map(file -> new FileInformation(file.getAbsolutePath())).collect(Collectors.toList()));
-                });
+                filesToUpdateMap.putAll(sourceFiles.entrySet().parallelStream().filter(entry -> !destinationFiles.containsKey(entry.getKey()))
+                        .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+                Platform.runLater(() -> listCellFileFactory.setItems(
+                        filesToUpdateMap.values().parallelStream().map(file -> new FileInformation(file.getAbsolutePath())).collect(Collectors.toList())));
 
                 return null;
             }
@@ -219,9 +216,7 @@ public class PhotoImportController extends Activity {
             LOG.info("Execution cancelled.");
             this.loadingInProgress.set(false);
             updateStateProgress("File loading cancelled.");
-            FxPlatformHelper.runOnFxThread(() -> {
-                this.listCellFileFactory.clear();
-            });
+            FxPlatformHelper.runOnFxThread(listCellFileFactory::clear);
         });
         fileLoadTask.setOnFailed(event -> {
             LOG.warn("Task failed: {}", fileLoadTask.getException().getMessage());
@@ -262,13 +257,9 @@ public class PhotoImportController extends Activity {
         final Task<Void> copyTask = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
-                final Callback<CopyInformation, Void> statusUpdateCallback = new Callback<CopyInformation, Void>() {
-                    @Override
-                    public Void call(final CopyInformation status) {
-                        updateStateProgress(status.getMessage());
-                        listCellFileFactory.updateCopyState(status.getFilePath(), status.isCopySuccess());
-                        return null;
-                    }
+                final Consumer<CopyInformation> statusUpdateCallback = status -> {
+                    updateStateProgress(status.getMessage());
+                    listCellFileFactory.updateCopyState(status.getFilePath(), status.isCopySuccess());
                 };
 
                 updateStateProgress("Start copying " + filesToUpdateMap.size() + " files.");
