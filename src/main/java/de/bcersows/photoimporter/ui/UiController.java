@@ -1,5 +1,6 @@
 package de.bcersows.photoimporter.ui;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.slf4j.Logger;
@@ -15,7 +16,10 @@ import de.bcersows.photoimporter.ToolConstants;
 import de.bcersows.photoimporter.helper.FxPlatformHelper;
 import de.bcersows.photoimporter.model.ToolSettings;
 import de.bcersows.photoimporter.ui.Activity.ActivityKey;
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -76,19 +80,26 @@ public class UiController {
 
     /** Action for the apply button. **/
     private final ObjectProperty<Runnable> buttonApplyAction;
-    /** Action for the retry button. **/
-    private final ObjectProperty<Runnable> buttonRetryAction;
+    /** Action for the reload button. **/
+    private final ObjectProperty<Runnable> buttonReloadAction;
+    /** If the apply button is disabled. **/
+    private final BooleanProperty buttonApplyDisabledProperty;
+    /** If the reload button is disabled. **/
+    private final BooleanProperty buttonReloadDisabledProperty;
 
     /** Create instance. **/
     public UiController() {
         buttonApplyAction = new SimpleObjectProperty<>();
-        buttonRetryAction = new SimpleObjectProperty<>();
+        buttonReloadAction = new SimpleObjectProperty<>();
+
+        this.buttonApplyDisabledProperty = new SimpleBooleanProperty();
+        this.buttonReloadDisabledProperty = new SimpleBooleanProperty();
     }
 
     /** Initialize the main UI controller. **/
     @FXML
     public void initialize() {
-        // initialize the hamburger menu
+        // initialize the side panel
         this.navStorage.getChildren().remove(this.drawersStack);
         this.navStorage.getChildren().remove(this.navPanel);
         this.rootContent.getChildren().remove(centerContent);
@@ -97,24 +108,30 @@ public class UiController {
         this.rootContent.setLeft(null);
         this.navPanel.setSidePane(this.navPanelContent);
 
+        // initialize the hamburger menu
         final HamburgerSlideCloseTransition burgerTask = new HamburgerSlideCloseTransition(this.hamburger);
         burgerTask.setRate(-1);
-        this.hamburger.addEventHandler(MouseEvent.MOUSE_PRESSED, e -> {
+        this.hamburger.addEventHandler(MouseEvent.MOUSE_PRESSED, e -> drawersStack.toggle(navPanel));
+        final Runnable toggleBurger = () -> {
             burgerTask.setRate(burgerTask.getRate() * -1);
             burgerTask.play();
-
-            drawersStack.toggle(navPanel);
-        });
+        };
+        this.navPanel.setOnDrawerClosing(evt -> toggleBurger.run());
+        this.navPanel.setOnDrawerOpening(evt -> toggleBurger.run());
 
         // set the texts
         this.buttonApplyIcon.setText(ToolConstants.ICONS.FA_COPY.code);
         this.buttonReloadIcon.setText(ToolConstants.ICONS.FA_REPEAT.code);
         this.buttonExitIcon.setText(ToolConstants.ICONS.FA_EXIT.code);
 
+        // bind button visibility and disable
         this.buttonApply.visibleProperty().bind(this.buttonApplyAction.isNotNull());
         this.buttonApply.managedProperty().bind(this.buttonApply.visibleProperty());
-        this.buttonReload.visibleProperty().bind(this.buttonRetryAction.isNotNull());
+        this.buttonReload.visibleProperty().bind(this.buttonReloadAction.isNotNull());
         this.buttonReload.managedProperty().bind(this.buttonReload.visibleProperty());
+
+        this.buttonApply.disableProperty().bind(this.buttonApplyDisabledProperty);
+        this.buttonReload.disableProperty().bind(this.buttonReloadDisabledProperty);
 
         this.buttonNavMain.setOnAction(event -> this.main.showActivity(ActivityKey.IMPORT));
         this.buttonNavEvents.setOnAction(event -> this.main.showActivity(ActivityKey.EVENTS));
@@ -122,7 +139,7 @@ public class UiController {
 
     @FXML
     private void onActionButtonReload(final ActionEvent actionEvent) {
-        runAction(this.buttonRetryAction.get());
+        runAction(this.buttonReloadAction.get());
     }
 
     @FXML
@@ -159,18 +176,34 @@ public class UiController {
      * 
      * @param applyRunnable
      *            action for apply button
-     * @param retryRunnable
-     *            action for retry button
+     * @param reloadRunnable
+     *            action for reload button
      */
-    public final void setButtonActions(@Nullable final Runnable applyRunnable, @Nullable final Runnable retryRunnable) {
+    public final void setButtonActions(@Nullable final Runnable applyRunnable, @Nullable final Runnable reloadRunnable) {
         this.buttonApplyAction.set(applyRunnable);
-        this.buttonRetryAction.set(retryRunnable);
+        this.buttonReloadAction.set(reloadRunnable);
+    }
+
+    /**
+     * Set the button disable properties.
+     * 
+     * @param buttonApplyDisable
+     *            binding to disable the apply button
+     * @param buttonReloadDisable
+     *            binding to disable the reload button
+     */
+    public void setButtonDisableProperties(@Nullable final BooleanBinding buttonApplyDisable, @Nullable final BooleanBinding buttonReloadDisable) {
+        // unbind existing properties
+        this.buttonApplyDisabledProperty.unbind();
+        this.buttonReloadDisabledProperty.unbind();
+
+        // bind or set the new bindings
+        setButtonDisableProperty(this.buttonApplyDisabledProperty, buttonApplyDisable);
+        setButtonDisableProperty(this.buttonReloadDisabledProperty, buttonReloadDisable);
     }
 
     /**
      * Set the dynamic content to the given node.
-     * 
-     * @param root
      */
     public void setContent(final Parent root) {
         FxPlatformHelper.runOnFxThread(() -> {
@@ -178,6 +211,20 @@ public class UiController {
             VBox.setVgrow(root, Priority.ALWAYS);
             this.centerContent.getChildren().add(root);
         });
+    }
+
+    /**
+     * Set the disable property of a given property with the given binding.
+     */
+    private void setButtonDisableProperty(@Nonnull final BooleanProperty buttonDisabledProperty, @Nullable final BooleanBinding buttonDisableBinding) {
+        buttonDisabledProperty.unbind();
+
+        // set the disable binding
+        if (null != buttonDisableBinding) {
+            buttonDisabledProperty.bind(buttonDisableBinding);
+        } else {
+            buttonDisabledProperty.set(false);
+        }
     }
 
 }

@@ -4,9 +4,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import de.bcersows.photoimporter.model.ToolSettings;
-import de.bcersows.photoimporter.texts.TextDefinition;
+import javafx.beans.binding.BooleanBinding;
 import javafx.fxml.FXML;
-import javafx.scene.layout.Region;
 
 /**
  * Activity base class.
@@ -37,17 +36,10 @@ public abstract class Activity {
     /** Get the key of this activity. **/
     public abstract ActivityKey getActivityKey();
 
-    /** Return the action to set to apply button. **/
-    @Nullable
-    protected abstract Runnable getButtonActionApply();
-
-    /** Return the action to set to retry button. **/
-    @Nullable
-    protected abstract Runnable getButtonActionRetry();
-
     /** Run after activity was shown, e.g. to collect data. **/
     public final void postShow() {
-        this.uiController.setButtonActions(getButtonActionApply(), getButtonActionRetry());
+        this.uiController.setButtonActions(getButtonApplyAction(), getButtonReloadAction());
+        this.uiController.setButtonDisableProperties(getButtonApplyDisableProperty(), getButtonReloadDisableProperty());
         this.postShowActivity();
     }
 
@@ -56,18 +48,28 @@ public abstract class Activity {
         return this.uiController.getApplicationSettings();
     }
 
-    /**
-     * Return the size as String.
-     */
-    protected final String getSize(final Region region) {
-        return getSize(region.getWidth(), region.getHeight());
+    /** Return the action to set to apply button. **/
+    @Nullable
+    protected Runnable getButtonApplyAction() {
+        return null;
     }
 
-    /**
-     * Return the size as String.
-     */
-    protected final String getSize(final double width, final double height) {
-        return TextDefinition.BRACKET_OPEN + width + TextDefinition.SLASH + height + TextDefinition.BRACKET_CLOSE;
+    /** Return the action to set to reload button. **/
+    @Nullable
+    protected Runnable getButtonReloadAction() {
+        return null;
+    }
+
+    /** Return the property to disable the apply button. **/
+    @Nullable
+    protected BooleanBinding getButtonApplyDisableProperty() {
+        return null;
+    }
+
+    /** Return the property to disable the reload button. **/
+    @Nullable
+    protected BooleanBinding getButtonReloadDisableProperty() {
+        return null;
     }
 
     /** The possible activities. **/

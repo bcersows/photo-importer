@@ -3,6 +3,7 @@
  */
 package de.bcersows.photoimporter.model;
 
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Objects;
 
@@ -56,6 +57,11 @@ public class ApplicationEvent {
     @Override
     public String toString() {
         return "ApplicationEvent [time=" + this.time + ", message=" + this.message + ", type=" + this.applicationEventType + "]";
+    }
+
+    /** Get a comparator to sort in reverse chronological order (newest first). **/
+    public static Comparator<ApplicationEvent> getComparator() {
+        return Comparator.comparing(ApplicationEvent::getTime).reversed();
     }
 
 }

@@ -7,6 +7,9 @@ import java.util.Date;
 
 import javax.annotation.Nonnull;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.bcersows.photoimporter.model.ApplicationEvent;
 import de.bcersows.photoimporter.model.ApplicationEventType;
 import javafx.beans.property.ReadOnlyListProperty;
@@ -19,6 +22,7 @@ import javafx.collections.FXCollections;
  * @author BCE
  */
 public class ApplicationEventManager {
+    private static final Logger LOG = LoggerFactory.getLogger(ApplicationEventManager.class);
     /** Gathered events of this run. **/
     private final ReadOnlyListWrapper<ApplicationEvent> events;
 

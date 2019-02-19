@@ -3,8 +3,8 @@
  */
 package de.bcersows.photoimporter.ui;
 
-import java.io.File;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,10 +16,9 @@ import de.bcersows.photoimporter.ApplicationEventManager;
 import de.bcersows.photoimporter.helper.FxPlatformHelper;
 import de.bcersows.photoimporter.model.ApplicationEvent;
 import de.bcersows.photoimporter.ui.components.ListCellFileFactory;
-import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableMap;
 import javafx.fxml.FXML;
 
 /**
@@ -34,15 +33,12 @@ public class EventsController extends Activity {
     /** Logging manager. **/
     private final ApplicationEventManager eventManager;
 
-    /** Stores the files to update. **/
-    private final ObservableMap<String, File> filesToUpdateMap = FXCollections.observableHashMap();
-
     /** The cell factory for the file cells. **/
     private ListCellFileFactory listCellFileFactory;
 
     private final ObservableList<ApplicationEvent> eventsList;
 
-    private final ChangeListener<? super ObservableList<ApplicationEvent>> eventsListener;
+    private final ListChangeListener<ApplicationEvent> eventsListener;
 
     @Inject
     public EventsController(final UiController uiController, final ApplicationEventManager eventManager) {
@@ -50,8 +46,10 @@ public class EventsController extends Activity {
 
         this.eventManager = eventManager;
         this.eventsList = FXCollections.observableArrayList();
-        this.eventsListener = (oldVal, newVal, obs) -> {
-            LOG.debug("Change! {}", newVal);
+        this.eventsListener = evt -> {
+            while (evt.next()) {
+                this.eventsList.addAll(0, evt.getAddedSubList().stream().sorted(ApplicationEvent.getComparator()).collect(Collectors.toList()));
+            }
         };
     }
 
@@ -68,24 +66,18 @@ public class EventsController extends Activity {
 
     @Override
     public void terminate() {
-        this.filesToUpdateMap.clear();
         eventManager.getEvents().removeListener(eventsListener);
         this.eventsList.clear();
     }
 
     @Override
     public void postShowActivity() {
-        this.eventsList.addAll(eventManager.getEvents());
+        this.eventsList.addAll(eventManager.getEvents().sorted(ApplicationEvent.getComparator()));
         eventManager.getEvents().addListener(eventsListener);
     }
 
     @Override
-    protected Runnable getButtonActionApply() {
-        return null;
-    }
-
-    @Override
-    protected Runnable getButtonActionRetry() {
+    protected Runnable getButtonReloadAction() {
         // return null;
         return () -> {
             eventManager.addEvent(new Date(), "Yeah! " + new Date());

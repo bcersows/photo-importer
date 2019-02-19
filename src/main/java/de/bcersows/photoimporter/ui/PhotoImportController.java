@@ -36,6 +36,7 @@ import de.bcersows.photoimporter.texts.TextDefinition;
 import de.bcersows.photoimporter.ui.components.ListCellFileFactory;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -141,6 +142,7 @@ public class PhotoImportController extends Activity {
         this.headerLoadingIndicator.visibleProperty().bind(this.loadingInProgress);
         this.headerLoadingIndicator.managedProperty().bind(this.headerLoadingIndicator.visibleProperty());
 
+        // FIXME bce bce actually disable the buttons in the UiController
         this.buttonReload.disableProperty().bind(this.loadingInProgress);
         this.buttonApply.disableProperty().bind(this.loadingInProgress.or(Bindings.size(filesToUpdateMap).lessThanOrEqualTo(0)));
 
@@ -292,7 +294,7 @@ public class PhotoImportController extends Activity {
     }
 
     @Override
-    protected Runnable getButtonActionApply() {
+    protected Runnable getButtonApplyAction() {
         return () -> {
             progressProperty.set(null);
             copyFiles();
@@ -300,8 +302,18 @@ public class PhotoImportController extends Activity {
     }
 
     @Override
-    protected Runnable getButtonActionRetry() {
+    protected Runnable getButtonReloadAction() {
         return this::loadFiles;
+    }
+
+    @Override
+    protected BooleanBinding getButtonApplyDisableProperty() {
+        return this.loadingInProgress.not().not();
+    }
+
+    @Override
+    protected BooleanBinding getButtonReloadDisableProperty() {
+        return this.loadingInProgress.or(Bindings.size(filesToUpdateMap).lessThanOrEqualTo(0));
     }
 
     /** Set the progress property to the given message. **/
