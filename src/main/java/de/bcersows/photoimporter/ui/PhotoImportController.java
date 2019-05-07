@@ -38,11 +38,11 @@ import de.bcersows.photoimporter.model.ToolSettings;
 import de.bcersows.photoimporter.texts.TextDefinition;
 import de.bcersows.photoimporter.ui.components.ListCellFileFactory;
 import javafx.application.Platform;
-import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ObservableBooleanValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
@@ -323,13 +323,13 @@ public class PhotoImportController extends Activity {
     }
 
     @Override
-    protected BooleanBinding getButtonApplyDisableProperty() {
+    protected ObservableBooleanValue getButtonApplyDisableProperty() {
         return this.loadingInProgress.not().not();
     }
 
     @Override
-    protected BooleanBinding getButtonReloadDisableProperty() {
-        return this.loadingInProgress.not().not();
+    protected ObservableBooleanValue getButtonReloadDisableProperty() {
+        return this.loadingInProgress;
         // return this.loadingInProgress.or(Bindings.size(filesToUpdateMap).lessThanOrEqualTo(0));
     }
 

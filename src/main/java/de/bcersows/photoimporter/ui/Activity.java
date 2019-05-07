@@ -5,7 +5,7 @@ import javax.annotation.Nullable;
 
 import de.bcersows.photoimporter.ToolConstants;
 import de.bcersows.photoimporter.model.ToolSettings;
-import javafx.beans.binding.BooleanBinding;
+import javafx.beans.value.ObservableBooleanValue;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -16,6 +16,8 @@ import javafx.scene.control.Label;
  * @author BCE
  */
 public abstract class Activity {
+    /** A log message for when an UI event was caused. **/
+    public static final String LOG_MESSAGE_EVENT = "Caused event: {}.";
     /** UI controller for the scene. **/
     protected final UiController uiController;
 
@@ -65,13 +67,13 @@ public abstract class Activity {
 
     /** Return the property to disable the apply button. **/
     @Nullable
-    protected BooleanBinding getButtonApplyDisableProperty() {
+    protected ObservableBooleanValue getButtonApplyDisableProperty() {
         return null;
     }
 
     /** Return the property to disable the reload button. **/
     @Nullable
-    protected BooleanBinding getButtonReloadDisableProperty() {
+    protected ObservableBooleanValue getButtonReloadDisableProperty() {
         return null;
     }
 

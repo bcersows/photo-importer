@@ -22,6 +22,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -41,6 +42,8 @@ public class Main extends Application {
     private static final double WINDOW_MIN_WIDTH = 800;
     /** Path to the CSS file. **/
     private static final String CSS_PATH = "/style/application.css";
+    /** Path to the icon file. **/
+    private static final String ICON_PATH = "/style/imgs/icon.png";
 
     private ToolSettings settings;
 
@@ -49,7 +52,6 @@ public class Main extends Application {
 
     private ApplicationEventManager applicationEventManager;
 
-    // private Stage primaryStage ;
     private Scene scene;
     /** Loaded UI controller. **/
     private UiController uiController;
@@ -65,15 +67,14 @@ public class Main extends Application {
         final Parameters parameters = getParameters();
         this.settings = new ToolSettings(parameters.getRaw().toArray(new String[0]));
 
-        // this.primaryStage = stage;
-
         stage.setTitle(APPLICATION_NAME);
         stage.setOnCloseRequest(this::onCloseRequest);
         stage.setMinHeight(WINDOW_MIN_HEIGHT);
         stage.setMinWidth(WINDOW_MIN_WIDTH);
-        // stage.initStyle(StageStyle.UNDECORATED);
+        stage.getIcons().add(new Image(this.getClass().getResourceAsStream(ICON_PATH)));
 
-        final Injector injector = Guice.createInjector(new ApplicationConfig(applicationEventManager));
+        // create the Guice injector
+        final Injector injector = Guice.createInjector(new ApplicationConfig(applicationEventManager, this));
 
         // load the activities
         loadActivities(injector);
@@ -95,7 +96,6 @@ public class Main extends Application {
         // need to load main first
         final FXMLLoader uiSceneLoader = new FXMLLoader(getClass().getResource("/fxml/Main.fxml"));
         uiController = injector.getInstance(UiController.class);
-        uiController.setMain(this);
         uiSceneLoader.setController(uiController);
         final Parent uiRoot = uiSceneLoader.load();
 
