@@ -329,7 +329,7 @@ public class PhotoImportController extends Activity {
 
     @Override
     protected BooleanBinding getButtonReloadDisableProperty() {
-        return this.loadingInProgress;
+        return this.loadingInProgress.not().not();
         // return this.loadingInProgress.or(Bindings.size(filesToUpdateMap).lessThanOrEqualTo(0));
     }
 
