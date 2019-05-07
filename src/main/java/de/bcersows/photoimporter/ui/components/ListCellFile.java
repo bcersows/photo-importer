@@ -6,12 +6,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.annotation.Nullable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.bcersows.photoimporter.ToolConstants;
 import de.bcersows.photoimporter.model.FileInformation;
-import de.bcersows.photoimporter.texts.TextDefinition;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -33,12 +34,11 @@ public class ListCellFile extends ListCell<FileInformation> {
     private static final double ICON_WIDTH = 50;
     /** The size of the image previews. **/
     private static final double IMAGE_SIZE = 50;
+
     /** The information for this cell. **/
-    private final FileInformation fileInformation;
+    private FileInformation fileInformation;
 
     public ListCellFile() {
-        // nothing
-        this.fileInformation = new FileInformation(TextDefinition.EMPTY);
         this.imageView = new ImageView();
         this.imageView.setFitHeight(ICON_WIDTH);
         this.imageView.setFitWidth(ICON_WIDTH);
@@ -46,19 +46,23 @@ public class ListCellFile extends ListCell<FileInformation> {
 
     /** Flag this file as copied. **/
     public void setCopied() {
-        this.fileInformation.setCopied();
+        if (null != fileInformation) {
+            this.fileInformation.setCopied();
+        }
     }
 
     @Override
-    protected void updateItem(final FileInformation item, final boolean empty) {
+    protected void updateItem(@Nullable final FileInformation item, final boolean empty) {
         super.updateItem(item, empty);
 
         if (null != item && !empty) {
+            this.fileInformation = item;
             setText(item.getPath());
             setGraphic(getCopyGraphic(item.getPath(), item.isWasCopied()));
         } else {
             setText(null);
             setGraphic(null);
+            this.fileInformation = null;
         }
     }
 

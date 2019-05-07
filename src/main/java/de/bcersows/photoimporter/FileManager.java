@@ -12,6 +12,10 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOCase;
+import org.apache.commons.io.filefilter.DirectoryFileFilter;
+import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +58,8 @@ public class FileManager {
                 final File source = new File(path);
 
                 if (source.exists() && source.canRead()) {
-                    final Collection<File> fileList = FileUtils.listFiles(source, validFileTypes, true);
+                    final IOFileFilter extensionFilter = new SuffixFileFilter(validFileTypes, IOCase.INSENSITIVE);
+                    final Collection<File> fileList = FileUtils.listFiles(source, extensionFilter, DirectoryFileFilter.DIRECTORY);
                     files.putAll(fileList.stream().parallel().collect(Collectors.toMap(File::getName, Function.identity(), (file1, file2) -> file1)));
                 }
             } else {

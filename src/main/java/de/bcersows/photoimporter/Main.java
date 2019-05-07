@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.EnumMap;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +58,7 @@ public class Main extends Application {
     // private Injector injector;
 
     @Override
-    public void start(final Stage stage) throws Exception {
+    public void start(@Nonnull final Stage stage) throws Exception {
         LOG.info("Start application.");
         this.applicationEventManager = new ApplicationEventManager();
 
@@ -88,7 +91,7 @@ public class Main extends Application {
      * @param injector
      *            the injector used to load the activities
      **/
-    private void loadActivities(final Injector injector) throws IOException {
+    private void loadActivities(@Nonnull final Injector injector) throws IOException {
         // need to load main first
         final FXMLLoader uiSceneLoader = new FXMLLoader(getClass().getResource("/fxml/Main.fxml"));
         uiController = injector.getInstance(UiController.class);
@@ -106,6 +109,7 @@ public class Main extends Application {
             final Activity activity = injector.getInstance(clazz);
             sceneLoader.setController(activity);
             final Parent root = sceneLoader.load();
+            root.getStylesheets().clear();
 
             final LoadedActivity loadedActivity = new LoadedActivity(key, key.getFxmlPath(), activity, root);
 
@@ -114,7 +118,7 @@ public class Main extends Application {
     }
 
     /** Show an activity. **/
-    public void showActivity(final ActivityKey key) {
+    public void showActivity(@Nonnull final ActivityKey key) {
         terminateCurrentActivity();
 
         final LoadedActivity activity = this.activities.get(key);
@@ -125,7 +129,7 @@ public class Main extends Application {
     }
 
     /** Get the scene or create a new one. **/
-    private Scene createScene(final Parent root) {
+    private Scene createScene(@Nonnull final Parent root) {
         if (null == this.scene) {
             final Scene rootScene = new Scene(root);
             rootScene.getStylesheets().add(getClass().getResource(CSS_PATH).toExternalForm());
@@ -140,7 +144,7 @@ public class Main extends Application {
     }
 
     /** The close request, shutting down and clearing up everything. **/
-    public void onCloseRequest(final WindowEvent windowEvent) {
+    public void onCloseRequest(@Nullable final WindowEvent windowEvent) {
         terminateCurrentActivity();
         this.applicationEventManager.shutdown();
 
@@ -167,6 +171,7 @@ public class Main extends Application {
         }
     }
 
+    /** Launch the application. **/
     public static void main(final String[] args) {
         Application.launch(args);
     }

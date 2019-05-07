@@ -1,5 +1,6 @@
 package de.bcersows.photoimporter.ui.components;
 
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -44,6 +45,24 @@ public class ListCellFileFactory implements Callback<ListView<FileInformation>, 
     public void setItems(final List<FileInformation> items) {
         LOG.info("Set {} items.", items.size());
         this.items.get().setAll(items);
+        // sort the items ascending by default
+        sortItems(true);
+    }
+
+    /** Sort the <b>currently</b> displayed items, either ascending or descending. **/
+    public void sortItems(final boolean sortAscending) {
+        final Comparator<FileInformation> baseComparator = Comparator.comparing(FileInformation::getPath);
+        final Comparator<FileInformation> comparator;
+        if (sortAscending) {
+            // either use the base comparator...
+            comparator = baseComparator;
+        } else {
+            // ... or reverse it for descending order
+            comparator = baseComparator.reversed();
+        }
+
+        // actually sort
+        this.items.sort(comparator);
     }
 
     /** Clear the items. **/

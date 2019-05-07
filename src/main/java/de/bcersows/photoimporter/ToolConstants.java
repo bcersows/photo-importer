@@ -7,7 +7,7 @@ package de.bcersows.photoimporter;
  */
 public class ToolConstants {
     /** The CSS class to mark a node as a Font Awesome one. **/
-    public static String CSS_CLASS_FONT_AWESOME = "fontAwesome";
+    public static final String CSS_CLASS_FONT_AWESOME = "fontAwesome";
 
     /** FontAwesome icons. **/
     public enum ICONS {
@@ -20,7 +20,10 @@ public class ToolConstants {
         /** Exit/logout icon. **/
         FA_EXIT("\uf2f5"),
 
-        ;
+        /** Sort alphabetically ascending. **/
+        FA_SORT_ASC("\uf15d"),
+        /** Sort alphabetically descending. **/
+        FA_SORT_DESC("\uf15e"),;
 
         public final String code;
 

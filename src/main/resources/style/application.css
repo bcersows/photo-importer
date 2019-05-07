@@ -82,15 +82,15 @@
 }
 
 
-#contentArea > .contentContainer {
+#contentArea .contentContainer {
 	-fx-padding: 5px;
 	-fx-min-height: 40pt;
 	
 	-fx-background-color: colorBackground;
 }
-#contentArea > .contentContainer.mainContentContainer {
+#contentArea .contentContainer.mainContentContainer {
 	-fx-min-width: 300pt;
 }
-#contentArea > .contentContainer .contentContainerHeader {
+#contentArea .contentContainer .contentContainerHeader {
 	-fx-font-size: 14pt;
 }

@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXListView?>
 <?import com.jfoenix.controls.JFXScrollPane?>
 <?import java.lang.String?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="photoImport" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+<VBox fx:id="photoImport" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" stylesheets="@../style/application.css" BorderPane.alignment="CENTER" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
     <children>
         <HBox fx:id="areaProgress" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" prefHeight="35.0" spacing="5.0" VBox.vgrow="NEVER">
             <children>
@@ -27,36 +29,72 @@
                 </Pane>
             </children>
         </HBox>
-        <BorderPane fx:id="contentArea" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" VBox.vgrow="ALWAYS">
-            <left>
-                <VBox fx:id="contentSide" minHeight="-Infinity" minWidth="-Infinity" spacing="5.0" styleClass="contentContainer" BorderPane.alignment="CENTER">
+      <SplitPane fx:id="contentArea" dividerPositions="0.3" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+         <items>
+                <VBox fx:id="contentSide" minHeight="-Infinity" minWidth="-Infinity" spacing="15.0" styleClass="contentContainer">
                     <children>
+                  <VBox fx:id="sideBarAreaConfiguration" spacing="5.0">
+                     <children>
+                              <Label styleClass="contentContainerHeader" text="CONFIGURATION" />
+                        <VBox>
+                           <children>
+                                      <Label text="Source folder(s):" wrapText="true" />
+                                      <Label fx:id="labelConfigurationSource" maxWidth="300.0" text="-" wrapText="true">
+                                 <VBox.margin>
+                                    <Insets left="15.0" />
+                                 </VBox.margin>
+                              </Label>
+                           </children>
+                        </VBox>
+                        <VBox>
+                           <children>
+                                      <Label text="Destination folder:" wrapText="true" />
+                                      <Label fx:id="labelConfigurationDestination" maxWidth="300.0" text="-" wrapText="true">
+                                 <VBox.margin>
+                                    <Insets left="15.0" />
+                                 </VBox.margin>
+                              </Label>
+                           </children>
+                        </VBox>
+                     </children>
+                  </VBox>
+                  <VBox fx:id="sideBarAreaStatus" layoutX="10.0" layoutY="10.0" spacing="5.0">
+                     <children>
                         <Label styleClass="contentContainerHeader" text="STATUS" />
                         <HBox spacing="10.0">
-                            <children>
-                                <Label text="Source file amount:" />
-                                <Label fx:id="labelFileAmountSource" text="0" />
-                            </children>
+                           <children>
+                              <Label text="Source file amount:" wrapText="true" />
+                              <Label fx:id="labelFileAmountSource" text="0" />
+                           </children>
                         </HBox>
-                        <HBox layoutX="10.0" layoutY="27.0" spacing="10.0">
-                            <children>
-                                <Label text="Destination file amount:" />
-                                <Label fx:id="labelFileAmountDestination" text="0" />
-                            </children>
+                        <HBox spacing="10.0">
+                           <children>
+                              <Label text="Destination file amount:" wrapText="true" />
+                              <Label fx:id="labelFileAmountDestination" text="0" />
+                           </children>
                         </HBox>
-                        <HBox layoutX="10.0" layoutY="44.0" spacing="10.0">
-                            <children>
-                                <Label text="To update:" />
-                                <Label fx:id="labelFileAmountUpdate" text="0" />
-                            </children>
+                        <HBox spacing="10.0">
+                           <children>
+                              <Label text="To update:" wrapText="true" />
+                              <Label fx:id="labelFileAmountUpdate" text="0" />
+                           </children>
                         </HBox>
+                     </children>
+                  </VBox>
                     </children>
                 </VBox>
-            </left>
-            <center>
-                <VBox fx:id="listFilesArea" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" BorderPane.alignment="CENTER">
+                <VBox fx:id="listFilesArea" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity">
                     <children>
-                        <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" styleClass="contentContainerHeader" text="TO COPY" VBox.vgrow="NEVER" />
+                  <HBox alignment="CENTER_LEFT" VBox.vgrow="NEVER">
+                     <children>
+                              <Label maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" styleClass="contentContainerHeader" text="TO COPY" wrapText="true" HBox.hgrow="ALWAYS" />
+                        <JFXButton fx:id="buttonSortAsc" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="25.0" />
+                        <JFXButton fx:id="buttonSortDesc" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" layoutX="365.0" layoutY="13.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="25.0" />
+                     </children>
+                     <padding>
+                        <Insets right="10.0" />
+                     </padding>
+                  </HBox>
                         <JFXScrollPane fx:id="listFilesScroll" alignment="TOP_LEFT" minHeight="-Infinity" minWidth="-Infinity" style="-fx-background-color: GREEN;" VBox.vgrow="ALWAYS">
                             <children>
                                 <JFXListView fx:id="listFilesToUpdate" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" showTooltip="true" />
@@ -68,7 +106,7 @@
                         <String fx:value="mainContentContainer" />
                     </styleClass>
                 </VBox>
-            </center>
-        </BorderPane>
+         </items>
+      </SplitPane>
     </children>
 </VBox>

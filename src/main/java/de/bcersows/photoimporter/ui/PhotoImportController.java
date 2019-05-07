@@ -16,6 +16,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nonnull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +27,7 @@ import com.jfoenix.controls.JFXScrollPane;
 
 import de.bcersows.photoimporter.ApplicationEventManager;
 import de.bcersows.photoimporter.FileManager;
+import de.bcersows.photoimporter.ToolConstants;
 import de.bcersows.photoimporter.helper.CustomNamedThreadFactory;
 import de.bcersows.photoimporter.helper.FxPlatformHelper;
 import de.bcersows.photoimporter.model.ApplicationEventType;
@@ -35,7 +38,6 @@ import de.bcersows.photoimporter.model.ToolSettings;
 import de.bcersows.photoimporter.texts.TextDefinition;
 import de.bcersows.photoimporter.ui.components.ListCellFileFactory;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -47,7 +49,7 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.control.SplitPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -68,7 +70,12 @@ public class PhotoImportController extends Activity {
     private Label labelProgressStatus;
 
     @FXML
-    private BorderPane contentArea;
+    private SplitPane contentArea;
+
+    @FXML
+    private Label labelConfigurationSource;
+    @FXML
+    private Label labelConfigurationDestination;
 
     @FXML
     private Label labelFileAmountSource;
@@ -87,15 +94,16 @@ public class PhotoImportController extends Activity {
     private JFXListView<FileInformation> listFilesToUpdate;
 
     @FXML
-    private final Button buttonApply = new Button();
-    @FXML
-    private final Button buttonReload = new Button();
-    @FXML
     private Label buttonApplyIcon;
     @FXML
     private Label buttonReloadIcon;
     @FXML
     private Label buttonExitIcon;
+
+    @FXML
+    private Button buttonSortAsc;
+    @FXML
+    private Button buttonSortDesc;
 
     private final StringProperty progressProperty = new SimpleStringProperty();
 
@@ -126,7 +134,8 @@ public class PhotoImportController extends Activity {
     private final DateFormat stateProgressDateFormat;
 
     @Inject
-    public PhotoImportController(final UiController uiController, final FileManager fileManager, final ApplicationEventManager eventManager) {
+    public PhotoImportController(@Nonnull final UiController uiController, @Nonnull final FileManager fileManager,
+            @Nonnull final ApplicationEventManager eventManager) {
         super(uiController);
 
         this.fileManager = fileManager;
@@ -142,10 +151,6 @@ public class PhotoImportController extends Activity {
         this.headerLoadingIndicator.visibleProperty().bind(this.loadingInProgress);
         this.headerLoadingIndicator.managedProperty().bind(this.headerLoadingIndicator.visibleProperty());
 
-        // FIXME bce bce actually disable the buttons in the UiController
-        this.buttonReload.disableProperty().bind(this.loadingInProgress);
-        this.buttonApply.disableProperty().bind(this.loadingInProgress.or(Bindings.size(filesToUpdateMap).lessThanOrEqualTo(0)));
-
         this.labelProgressStatus.textProperty().bind(this.progressProperty);
 
         this.executor = Executors.newSingleThreadScheduledExecutor(new CustomNamedThreadFactory("PHOTO_IMPORT_LOAD"));
@@ -156,6 +161,12 @@ public class PhotoImportController extends Activity {
             this.listFilesToUpdate.refresh();
             this.listFilesToUpdate.requestLayout();
         });
+
+        // set the icons of the sort buttons
+        this.buttonSortAsc.setGraphic(createIconPane(ToolConstants.ICONS.FA_SORT_ASC));
+        this.buttonSortDesc.setGraphic(createIconPane(ToolConstants.ICONS.FA_SORT_DESC));
+        this.buttonSortAsc.setOnAction(event -> listCellFileFactory.sortItems(true));
+        this.buttonSortDesc.setOnAction(event -> listCellFileFactory.sortItems(false));
     }
 
     @Override
@@ -172,6 +183,9 @@ public class PhotoImportController extends Activity {
         final ToolSettings settings = getApplicationSettings();
         this.sourcePaths = settings.getSourceFolder();
         this.destinationPath = settings.getDestinationFolder();
+
+        this.labelConfigurationSource.setText(String.join(", ", sourcePaths));
+        this.labelConfigurationDestination.setText(destinationPath);
     }
 
     /** Load the files from the disk. **/
@@ -205,10 +219,12 @@ public class PhotoImportController extends Activity {
                     throw e;
                 }
 
+                // map the files...
                 filesToUpdateMap.putAll(sourceFiles.entrySet().parallelStream().filter(entry -> !destinationFiles.containsKey(entry.getKey()))
                         .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
-                Platform.runLater(() -> listCellFileFactory.setItems(
-                        filesToUpdateMap.values().parallelStream().map(file -> new FileInformation(file.getAbsolutePath())).collect(Collectors.toList())));
+                // ... and set them to the list
+                FxPlatformHelper.runOnFxThread(
+                        () -> listCellFileFactory.setItems(filesToUpdateMap.values().parallelStream().map(FileInformation::new).collect(Collectors.toList())));
 
                 return null;
             }
@@ -313,7 +329,8 @@ public class PhotoImportController extends Activity {
 
     @Override
     protected BooleanBinding getButtonReloadDisableProperty() {
-        return this.loadingInProgress.or(Bindings.size(filesToUpdateMap).lessThanOrEqualTo(0));
+        return this.loadingInProgress;
+        // return this.loadingInProgress.or(Bindings.size(filesToUpdateMap).lessThanOrEqualTo(0));
     }
 
     /** Set the progress property to the given message. **/

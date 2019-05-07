@@ -3,9 +3,12 @@ package de.bcersows.photoimporter.ui;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import de.bcersows.photoimporter.ToolConstants;
 import de.bcersows.photoimporter.model.ToolSettings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
 
 /**
  * Activity base class.
@@ -70,6 +73,14 @@ public abstract class Activity {
     @Nullable
     protected BooleanBinding getButtonReloadDisableProperty() {
         return null;
+    }
+
+    /** Create an icon with the given FA icon code. **/
+    @Nonnull
+    protected final Node createIconPane(@Nonnull final ToolConstants.ICONS icon) {
+        final Label graphicPane = new Label(icon.code);
+        graphicPane.getStyleClass().add(ToolConstants.CSS_CLASS_FONT_AWESOME);
+        return graphicPane;
     }
 
     /** The possible activities. **/

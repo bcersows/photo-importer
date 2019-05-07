@@ -57,6 +57,9 @@ public class UiController {
     private JFXHamburger hamburger;
 
     @FXML
+    private Label title;
+
+    @FXML
     private VBox centerContent;
 
     @FXML
@@ -133,6 +136,7 @@ public class UiController {
         this.buttonApply.disableProperty().bind(this.buttonApplyDisabledProperty);
         this.buttonReload.disableProperty().bind(this.buttonReloadDisabledProperty);
 
+        this.title.setOnMouseClicked(event -> this.main.showActivity(ActivityKey.IMPORT));
         this.buttonNavMain.setOnAction(event -> this.main.showActivity(ActivityKey.IMPORT));
         this.buttonNavEvents.setOnAction(event -> this.main.showActivity(ActivityKey.EVENTS));
     }
