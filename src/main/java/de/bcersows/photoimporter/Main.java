@@ -56,9 +56,6 @@ public class Main extends Application {
     /** Loaded UI controller. **/
     private UiController uiController;
 
-    /** The Guice injector. **/
-    // private Injector injector;
-
     @Override
     public void start(@Nonnull final Stage stage) throws Exception {
         LOG.info("Start application.");
